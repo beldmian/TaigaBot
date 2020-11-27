@@ -2,19 +2,23 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
-	"github.com/bwmarrin/discordgo"
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/gofont/goregular"
-	"golang.org/x/image/font/opentype"
 	"image"
 	"image/color"
 	"image/png"
 	"log"
+	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/gofont/goregular"
+	"golang.org/x/image/font/opentype"
 )
 
+// BulkDelete provides handler for !delete command
 func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 	count, err := strconv.Atoi(strings.Split(m.Content, " ")[1])
 	if err != nil {
@@ -35,6 +39,8 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 		log.Fatal(err)
 	}
 }
+
+// ColorsList provides handler for !colors command
 func ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 	roles, _ := s.GuildRoles(m.GuildID)
 	var colors []color.RGBA
@@ -77,6 +83,8 @@ func ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 		log.Fatal(err)
 	}
 }
+
+// PickColor provides handler for !color command
 func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 	userColor := strings.Split(m.Content, " ")[1]
 	roles, _ := s.GuildRoles(m.GuildID)
@@ -106,6 +114,8 @@ func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 }
+
+// MassRole provides handler for !massrole command
 func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 	role := m.MentionRoles[0]
 	isUserHaveRole := false
@@ -135,4 +145,32 @@ func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if _, err := s.ChannelMessageSend(m.ChannelID, "Done!"); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// GetAnime provides handler for !anime command
+func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
+	command := strings.Split(m.Content, " ")
+	search := strings.Join(command[1:cap(command)], "%20")
+	resp, err := http.Get("https://shikimori.one/api/animes?search="+search+"&limit=10&order=ranked")
+	if err != nil {
+		log.Fatal(err)
+	}
+	var result []map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+	id := strconv.Itoa(int(result[0]["id"].(float64)))
+	respNew, err := http.Get("https://shikimori.one/api/animes/"+id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var resultDetail map[string]interface{}
+	json.NewDecoder(respNew.Body).Decode(&resultDetail)
+	embed := &discordgo.MessageEmbed{
+		Title: resultDetail["russian"].(string),
+		URL: "https://plashiki.su/anime/"+id,
+		Description: resultDetail["description"].(string),
+		Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: "https://shikimori.one"+resultDetail["image"].(map[string]interface{})["preview"].(string),
+		},
+	}
+	s.ChannelMessageSendEmbed(m.ChannelID, embed)
 }

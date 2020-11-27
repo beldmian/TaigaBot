@@ -8,12 +8,14 @@ import (
 	"image/color"
 )
 
+// ParseHexColor provdes hex to RGBA color convertation
 func ParseHexColor(s string) (c color.RGBA, err error) {
 	c.A = 0xff
 	_, err = fmt.Sscanf(s, "%02x%02x%02x", &c.R, &c.G, &c.B)
 	return
 }
 
+// AddLabel provides writing a string with center cordinates
 func AddLabel(img *image.RGBA, x, y int, label string, face font.Face) {
 	col := color.White
 	length := font.MeasureString(face, label)

@@ -8,11 +8,11 @@ import (
 	"syscall"
 )
 
-var LogsId string
+var logsID string
 
 func main() {
 	token, exists := os.LookupEnv("TOKEN")
-	LogsId, exists = os.LookupEnv("LOGS_ID")
+	logsID, exists = os.LookupEnv("LOGS_ID")
 	if !exists {
 		log.Print("No token or logs channel ID provided")
 		return

@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// OnMessage provide handler for MessageCreate event
 func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Content == "!colors" {
 		go ColorsList(s, m)
@@ -15,18 +16,24 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go BulkDelete(s, m)
 	} else if strings.HasPrefix(m.Content, "!massrole ") {
 		go MassRole(s, m)
+	} else if strings.HasPrefix(m.Content, "!anime ") {
+		go GetAnime(s, m)
 	}
 }
+
+// OnBan provide handler for GuildBanAdd event
 func OnBan(s *discordgo.Session, m *discordgo.GuildBanAdd) {
-	if _, err := s.ChannelMessageSendEmbed(LogsId, &discordgo.MessageEmbed{
+	if _, err := s.ChannelMessageSendEmbed(logsID, &discordgo.MessageEmbed{
 		Title: m.User.Username + " был забанен на сервере",
 		Color: 2343740,
 	}); err != nil {
 		log.Fatal(err)
 	}
 }
+
+// OnMemberRemove provide handler for GuildMemberRemove event
 func OnMemberRemove(s *discordgo.Session, m *discordgo.GuildMemberRemove) {
-	if _, err := s.ChannelMessageSendEmbed(LogsId, &discordgo.MessageEmbed{
+	if _, err := s.ChannelMessageSendEmbed(logsID, &discordgo.MessageEmbed{
 		Title: m.User.Username + " больше не на сервере",
 		Color: 2343740,
 	}); err != nil {
