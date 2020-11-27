@@ -18,8 +18,7 @@ func AddLabel(img *image.RGBA, x, y int, label string, face font.Face) {
 	col := color.White
 	length := font.MeasureString(face, label)
 
-	point := fixed.Point26_6{X: fixed.Int26_6(x * 64)-length/2, Y: fixed.Int26_6((y+8) * 64)}
-
+	point := fixed.Point26_6{X: fixed.Int26_6(x*64) - length/2, Y: fixed.Int26_6((y + 8) * 64)}
 
 	d := &font.Drawer{
 		Dst:  img,
