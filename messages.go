@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"golang.org/x/image/font"
@@ -19,6 +20,19 @@ import (
 
 // BulkDelete provides handler for !delete command
 func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
+	roles := m.Member.Roles
+	premit := false
+	for _, role := range roles {
+		role, err := s.State.Role(m.GuildID, role)
+		if err != nil {
+			SendErrorMessage(s, err)
+		}
+		if role.Permissions & 8192 == 8192 || role.Permissions & 8 == 8 {
+			premit = true
+			break
+		}
+	}
+	if !premit {return}
 	count, err := strconv.Atoi(strings.Split(m.Content, " ")[1])
 	if err != nil {
 		SendErrorMessage(s, err)
@@ -34,9 +48,12 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if err := s.ChannelMessagesBulkDelete(m.ChannelID, ids); err != nil {
 		SendErrorMessage(s, err)
 	}
-	if _, err := s.ChannelMessageSend(m.ChannelID, "Успешно удалено "+strconv.Itoa(count)+" сообщений"); err != nil {
+	msg, err := s.ChannelMessageSend(m.ChannelID, "Успешно удалено "+strconv.Itoa(count)+" сообщений")
+	if err != nil {
 		SendErrorMessage(s, err)
 	}
+	time.Sleep(time.Second*5)
+	s.ChannelMessageDelete(m.ChannelID, msg.ID)
 }
 
 // ColorsList provides handler for !colors command
@@ -116,6 +133,19 @@ func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 // MassRole provides handler for !massrole command
 func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
+	roles := m.Member.Roles
+	premit := false
+	for _, role := range roles {
+		role, err := s.State.Role(m.GuildID, role)
+		if err != nil {
+			SendErrorMessage(s, err)
+		}
+		if role.Permissions & 268435456 == 268435456 || role.Permissions & 8 == 8 {
+			premit = true
+			break
+		}
+	}
+	if !premit {return}
 	role := m.MentionRoles[0]
 	isUserHaveRole := false
 	for _, userRole := range m.Member.Roles {
