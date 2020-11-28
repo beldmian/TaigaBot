@@ -9,7 +9,6 @@ import (
 	"github.com/beldmian/TaigaBot/pkg/bot"
 )
 
-
 func main() {
 	bot.InitBot()
 
