@@ -1,4 +1,4 @@
-package main
+package bot
 
 import (
 	"bytes"
@@ -202,4 +202,33 @@ func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 		},
 	}
 	s.ChannelMessageSendEmbed(m.ChannelID, embed)
+}
+
+// Help provides handler for !help command
+func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
+	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+		Title: "Комманды бота",
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name: "`!help`",
+				Value: "Список команд бота",
+			},
+			{
+				Name: "`!colors`",
+				Value: "Список доступниых цветов",
+			},
+			{
+				Name: "`!color <номер цвета>`",
+				Value: "Выдает вм этот цвет",
+			},
+			{
+				Name: "`!delete <число сообщений>`",
+				Value: "Удаляет сообщения",
+			},
+			{
+				Name: "`!massrole @<роль>`",
+				Value: "Выдает или забирает роь у всех на сервере",
+			},
+		},
+	})
 }

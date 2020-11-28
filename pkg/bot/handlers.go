@@ -1,4 +1,4 @@
-package main
+package bot
 
 import (
 	"github.com/bwmarrin/discordgo"
@@ -7,7 +7,10 @@ import (
 
 // OnMessage provide handler for MessageCreate event
 func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Content == "!colors" {
+	s.State.MessageAdd(m.Message)
+	if m.Content == "!help" {
+		go Help(s, m)
+	} else if m.Content == "!colors" {
 		go ColorsList(s, m)
 	} else if strings.HasPrefix(m.Content, "!color ") {
 		go PickColor(s, m)
@@ -38,4 +41,26 @@ func OnMemberRemove(s *discordgo.Session, m *discordgo.GuildMemberRemove) {
 	}); err != nil {
 		SendErrorMessage(s, err)
 	}
+}
+
+// OnEdit provide handler for MessageEdit event
+func OnEdit(s *discordgo.Session, m *discordgo.MessageUpdate) {
+	before , err := s.State.Message(m.ChannelID, m.ID)
+	if err != nil {
+		SendErrorMessage(s, err)
+	}
+	if before == nil {return}
+	s.ChannelMessageSendEmbed(logsID, &discordgo.MessageEmbed{
+		Title: "Изменено сообщение",
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name: "Было",
+				Value: before.Content,
+			},
+			{
+				Name: "Стало",
+				Value: m.Content,
+			},
+		},
+	})
 }

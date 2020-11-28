@@ -1,4 +1,4 @@
-module github.com/beldmian/rombick
+module github.com/beldmian/TaigaBot
 
 go 1.15
 

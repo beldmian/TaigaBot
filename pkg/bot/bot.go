@@ -1,16 +1,17 @@
-package main
+package bot
 
 import (
-	"github.com/bwmarrin/discordgo"
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 var logsID string
+var discord *discordgo.Session
 
-func main() {
+// InitBot initializes bot process
+func InitBot() {
 	token, exists := os.LookupEnv("TOKEN")
 	logsID, exists = os.LookupEnv("LOGS_ID")
 	if !exists {
@@ -24,15 +25,14 @@ func main() {
 	discord.AddHandler(OnMessage)
 	discord.AddHandler(OnBan)
 	discord.AddHandler(OnMemberRemove)
+	discord.AddHandler(OnEdit)
 	if err := discord.Open(); err != nil {
 		log.Fatal(err)
 	}
+}
 
-	log.Print("Started")
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
-	<-sc
-
+// StopBot stops the bot session
+func StopBot() {
 	if err := discord.Close(); err != nil {
 		log.Fatal(err)
 	}
