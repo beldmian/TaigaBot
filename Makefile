@@ -1,2 +1,2 @@
 run:
-	go build && ./rombick
+	go build && ./TaigaBot

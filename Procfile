@@ -1,1 +1,1 @@
-worker: ./bin/rombcick
+worker: ./bin/TaigaBot
