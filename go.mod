@@ -1,7 +1,5 @@
 module github.com/beldmian/TaigaBot
 
-// +heroku install ./cmd/...
-
 go 1.15
 
 require (

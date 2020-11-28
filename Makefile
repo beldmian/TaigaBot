@@ -1,2 +1,2 @@
 run:
-	go build ./cmd/taiga && ./taiga
+	go build && ./rombick
