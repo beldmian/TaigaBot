@@ -71,7 +71,7 @@ func ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 	})
 
 	for i := 0; i < colorsCount; i++ {
-		AddLabel(img, (i%6)*100+50, (i/6)*100+50, strconv.Itoa(i+1), face)
+		AddLabel(img, colors[i], (i%6)*100+50, (i/6)*100+50, strconv.Itoa(i+1), face)
 	}
 	buf := new(bytes.Buffer)
 	if err := png.Encode(buf, img); err != nil {

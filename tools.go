@@ -18,8 +18,12 @@ func ParseHexColor(s string) (c color.RGBA, err error) {
 }
 
 // AddLabel provides writing a string with center cordinates
-func AddLabel(img *image.RGBA, x, y int, label string, face font.Face) {
+func AddLabel(img *image.RGBA, bg color.RGBA, x, y int, label string, face font.Face) {
+	bgLum := (0.2126*float64(bg.R) + 0.7152*float64(bg.G) + 0.0722*float64(bg.B))
 	col := color.White
+	if bgLum > 130 {
+		col = color.Black
+	}
 	length := font.MeasureString(face, label)
 
 	point := fixed.Point26_6{X: fixed.Int26_6(x*64) - length/2, Y: fixed.Int26_6((y + 8) * 64)}
