@@ -7,9 +7,7 @@ import (
 	"image"
 	"image/color"
 	"image/png"
-	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 
@@ -23,21 +21,21 @@ import (
 func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 	count, err := strconv.Atoi(strings.Split(m.Content, " ")[1])
 	if err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 	messages, err := s.ChannelMessages(m.ChannelID, count+1, "", "", "")
 	if err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 	var ids []string
 	for _, message := range messages {
 		ids = append(ids, message.ID)
 	}
 	if err := s.ChannelMessagesBulkDelete(m.ChannelID, ids); err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 	if _, err := s.ChannelMessageSend(m.ChannelID, "Успешно удалено "+strconv.Itoa(count)+" сообщений"); err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 }
 
@@ -77,11 +75,11 @@ func ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	buf := new(bytes.Buffer)
 	if err := png.Encode(buf, img); err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 
 	if _, err := s.ChannelFileSend(m.ChannelID, "Colors.png", buf); err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 }
 
@@ -99,16 +97,16 @@ func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 	for _, role := range colorRoles {
 		if role.Name == userColor {
 			if err := s.GuildMemberRoleAdd(m.GuildID, m.Author.ID, role.ID); err != nil {
-				log.Fatal(err)
+				SendErrorMessage(s, err)
 			}
 			if _, err := s.ChannelMessageSend(m.ChannelID, "Роль успешно добавлена"); err != nil {
-				log.Fatal(err)
+				SendErrorMessage(s, err)
 			}
 		} else {
 			for _, colorRole := range m.Member.Roles {
 				if colorRole == role.ID {
 					if err := s.GuildMemberRoleRemove(m.GuildID, m.Author.ID, colorRole); err != nil {
-						log.Fatal(err)
+						SendErrorMessage(s, err)
 					}
 				}
 			}
@@ -128,23 +126,23 @@ func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	members, err := s.GuildMembers(m.GuildID, "", 1000)
 	if err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 	if !isUserHaveRole {
 		for _, member := range members {
 			if err := s.GuildMemberRoleAdd(m.GuildID, member.User.ID, role); err != nil {
-				log.Fatal(err)
+				SendErrorMessage(s, err)
 			}
 		}
 	} else {
 		for _, member := range members {
 			if err := s.GuildMemberRoleRemove(m.GuildID, member.User.ID, role); err != nil {
-				log.Fatal(err)
+				SendErrorMessage(s, err)
 			}
 		}
 	}
 	if _, err := s.ChannelMessageSend(m.ChannelID, "Done!"); err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 }
 
@@ -154,14 +152,14 @@ func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 	search := strings.Join(command[1:cap(command)], "%20")
 	resp, err := http.Get("https://shikimori.one/api/animes?search="+search+"&limit=10&order=ranked")
 	if err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 	var result []map[string]interface{}
 	json.NewDecoder(resp.Body).Decode(&result)
 	id := strconv.Itoa(int(result[0]["id"].(float64)))
 	respNew, err := http.Get("https://shikimori.one/api/animes/"+id)
 	if err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 	var resultDetail map[string]interface{}
 	json.NewDecoder(respNew.Body).Decode(&resultDetail)
@@ -174,26 +172,4 @@ func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 		},
 	}
 	s.ChannelMessageSendEmbed(m.ChannelID, embed)
-}
-
-// ExecCode provides handler for !exec command
-func ExecCode(s *discordgo.Session, m *discordgo.MessageCreate) {
-	command := strings.Split(m.Content, " ")
-	language := command[1]
-	script := strings.Join(command[2:cap(command)], " ")
-
-	clientID, exists := os.LookupEnv("CLIENT_ID")
-	clientSecret, exists := os.LookupEnv("CLIENT_SECRET")
-	if !exists {
-		s.ChannelMessageSend(m.ChannelID, "Error: `Some env variables not provided`")
-		return
-	}
-	jsonData := []byte(fmt.Sprintf("{\"clientId\": \"%v\", \"clientSecret\":\"%v\", \"script\":\"%v\", \"language\":\"%v\", \"versionIndex\":\"2\"}", clientID, clientSecret, script, language))
-	resp, err := http.Post("https://api.jdoodle.com/v1/execute", "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		log.Fatal(err)
-	}
-	var result map[string]interface{}
-	json.NewDecoder(resp.Body).Decode(&result)
-	s.ChannelMessageSend(m.ChannelID, result["output"].(string))
 }

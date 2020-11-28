@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"golang.org/x/image/font"
-	"golang.org/x/image/math/fixed"
 	"image"
 	"image/color"
+
+	"github.com/bwmarrin/discordgo"
+	"golang.org/x/image/font"
+	"golang.org/x/image/math/fixed"
 )
 
 // ParseHexColor provdes hex to RGBA color convertation
@@ -29,4 +31,13 @@ func AddLabel(img *image.RGBA, x, y int, label string, face font.Face) {
 		Dot:  point,
 	}
 	d.DrawString(label)
+}
+
+// SendErrorMessage ...
+func SendErrorMessage(s *discordgo.Session, err error) {
+	s.ChannelMessageSendEmbed(logsID, &discordgo.MessageEmbed{
+		Title: "Internal error occured",
+		Description: "Error trace: "+err.Error(),
+		Color: 2394819,
+	})
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/bwmarrin/discordgo"
-	"log"
 	"strings"
 )
 
@@ -18,8 +17,6 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go MassRole(s, m)
 	} else if strings.HasPrefix(m.Content, "!anime ") {
 		go GetAnime(s, m)
-	} else if strings.HasPrefix(m.Content, "!exec ") {
-		go ExecCode(s, m)
 	}
 }
 
@@ -29,7 +26,7 @@ func OnBan(s *discordgo.Session, m *discordgo.GuildBanAdd) {
 		Title: m.User.Username + " был забанен на сервере",
 		Color: 2343740,
 	}); err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 }
 
@@ -39,6 +36,6 @@ func OnMemberRemove(s *discordgo.Session, m *discordgo.GuildMemberRemove) {
 		Title: m.User.Username + " больше не на сервере",
 		Color: 2343740,
 	}); err != nil {
-		log.Fatal(err)
+		SendErrorMessage(s, err)
 	}
 }
