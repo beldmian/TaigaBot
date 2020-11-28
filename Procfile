@@ -1,1 +1,1 @@
-worker: ./bin/rombick
+worker: ./bin/taiga
