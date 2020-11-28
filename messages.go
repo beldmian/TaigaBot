@@ -9,6 +9,7 @@ import (
 	"image/png"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -173,4 +174,26 @@ func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 		},
 	}
 	s.ChannelMessageSendEmbed(m.ChannelID, embed)
+}
+
+// ExecCode provides handler for !exec command
+func ExecCode(s *discordgo.Session, m *discordgo.MessageCreate) {
+	command := strings.Split(m.Content, " ")
+	language := command[1]
+	script := strings.Join(command[2:cap(command)], " ")
+
+	clientID, exists := os.LookupEnv("CLIENT_ID")
+	clientSecret, exists := os.LookupEnv("CLIENT_SECRET")
+	if !exists {
+		s.ChannelMessageSend(m.ChannelID, "Error: `Some env variables not provided`")
+		return
+	}
+	jsonData := []byte(fmt.Sprintf("{\"clientId\": \"%v\", \"clientSecret\":\"%v\", \"script\":\"%v\", \"language\":\"%v\", \"versionIndex\":\"2\"}", clientID, clientSecret, script, language))
+	resp, err := http.Post("https://api.jdoodle.com/v1/execute", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Fatal(err)
+	}
+	var result map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+	s.ChannelMessageSend(m.ChannelID, result["output"].(string))
 }
