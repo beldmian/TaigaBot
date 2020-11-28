@@ -45,20 +45,22 @@ func OnMemberRemove(s *discordgo.Session, m *discordgo.GuildMemberRemove) {
 
 // OnEdit provide handler for MessageEdit event
 func OnEdit(s *discordgo.Session, m *discordgo.MessageUpdate) {
-	before , err := s.State.Message(m.ChannelID, m.ID)
+	before, err := s.State.Message(m.ChannelID, m.ID)
 	if err != nil {
 		SendErrorMessage(s, err)
 	}
-	if before == nil {return}
+	if before == nil {
+		return
+	}
 	s.ChannelMessageSendEmbed(logsID, &discordgo.MessageEmbed{
 		Title: "Изменено сообщение",
 		Fields: []*discordgo.MessageEmbedField{
 			{
-				Name: "Было",
+				Name:  "Было",
 				Value: before.Content,
 			},
 			{
-				Name: "Стало",
+				Name:  "Стало",
 				Value: m.Content,
 			},
 		},
