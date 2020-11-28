@@ -25,7 +25,7 @@ func InitBot() {
 	discord.AddHandler(OnMessage)
 	discord.AddHandler(OnBan)
 	discord.AddHandler(OnMemberRemove)
-	discord.AddHandler(OnEdit)
+	
 	if err := discord.Open(); err != nil {
 		log.Fatal(err)
 	}
