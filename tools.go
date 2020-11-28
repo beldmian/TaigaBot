@@ -40,8 +40,8 @@ func AddLabel(img *image.RGBA, bg color.RGBA, x, y int, label string, face font.
 // SendErrorMessage ...
 func SendErrorMessage(s *discordgo.Session, err error) {
 	s.ChannelMessageSendEmbed(logsID, &discordgo.MessageEmbed{
-		Title: "Internal error occured",
-		Description: "Error trace: "+err.Error(),
-		Color: 2394819,
+		Title:       "Internal error occured",
+		Description: "Error trace: " + err.Error(),
+		Color:       2394819,
 	})
 }

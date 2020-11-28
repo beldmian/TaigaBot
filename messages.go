@@ -150,25 +150,25 @@ func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 	command := strings.Split(m.Content, " ")
 	search := strings.Join(command[1:cap(command)], "%20")
-	resp, err := http.Get("https://shikimori.one/api/animes?search="+search+"&limit=10&order=ranked")
+	resp, err := http.Get("https://shikimori.one/api/animes?search=" + search + "&limit=10&order=ranked")
 	if err != nil {
 		SendErrorMessage(s, err)
 	}
 	var result []map[string]interface{}
 	json.NewDecoder(resp.Body).Decode(&result)
 	id := strconv.Itoa(int(result[0]["id"].(float64)))
-	respNew, err := http.Get("https://shikimori.one/api/animes/"+id)
+	respNew, err := http.Get("https://shikimori.one/api/animes/" + id)
 	if err != nil {
 		SendErrorMessage(s, err)
 	}
 	var resultDetail map[string]interface{}
 	json.NewDecoder(respNew.Body).Decode(&resultDetail)
 	embed := &discordgo.MessageEmbed{
-		Title: resultDetail["russian"].(string),
-		URL: "https://plashiki.su/anime/"+id,
+		Title:       resultDetail["russian"].(string),
+		URL:         "https://plashiki.su/anime/" + id,
 		Description: resultDetail["description"].(string),
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
-			URL: "https://shikimori.one"+resultDetail["image"].(map[string]interface{})["preview"].(string),
+			URL: "https://shikimori.one" + resultDetail["image"].(map[string]interface{})["preview"].(string),
 		},
 	}
 	s.ChannelMessageSendEmbed(m.ChannelID, embed)
