@@ -116,9 +116,12 @@ func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 			if err := s.GuildMemberRoleAdd(m.GuildID, m.Author.ID, role.ID); err != nil {
 				SendErrorMessage(s, err)
 			}
-			if _, err := s.ChannelMessageSend(m.ChannelID, "Роль успешно добавлена"); err != nil {
+			msg, err := s.ChannelMessageSend(m.ChannelID, "Цвет успешно изменен")
+			if err != nil {
 				SendErrorMessage(s, err)
 			}
+			time.Sleep(time.Second*5)
+			s.ChannelMessageDelete(m.ChannelID, msg.ID)
 		} else {
 			for _, colorRole := range m.Member.Roles {
 				if colorRole == role.ID {
@@ -206,29 +209,40 @@ func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 // Help provides handler for !help command
 func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
+	common := []*discordgo.MessageEmbedField{
+		{
+			Name: "`!help`",
+			Value: "Список команд бота",
+		},
+		{
+			Name: "`!colors`",
+			Value: "Список доступниых цветов",
+		},
+		{
+			Name: "`!color <номер цвета>`",
+			Value: "Выдает вам этот цвет",
+		},
+	}
+	moderation := []*discordgo.MessageEmbedField{
+		{
+			Name: "`!delete <число сообщений>`",
+			Value: "Удаляет сообщения",
+		},
+		{
+			Name: "`!massrole @<роль>`",
+			Value: "Выдает или забирает роль у всех на сервере",
+		},
+	}
+	fields := common
+	command := strings.Split(m.Content, " ")
+	if len(command) != 1 {
+		help := command[1]
+		if help == "moderation" {
+			fields = moderation
+		}
+	}
 	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 		Title: "Комманды бота",
-		Fields: []*discordgo.MessageEmbedField{
-			{
-				Name: "`!help`",
-				Value: "Список команд бота",
-			},
-			{
-				Name: "`!colors`",
-				Value: "Список доступниых цветов",
-			},
-			{
-				Name: "`!color <номер цвета>`",
-				Value: "Выдает вм этот цвет",
-			},
-			{
-				Name: "`!delete <число сообщений>`",
-				Value: "Удаляет сообщения",
-			},
-			{
-				Name: "`!massrole @<роль>`",
-				Value: "Выдает или забирает роь у всех на сервере",
-			},
-		},
+		Fields: fields,
 	})
 }

@@ -7,7 +7,7 @@ import (
 
 // OnMessage provide handler for MessageCreate event
 func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Content == "!help" {
+	if strings.HasPrefix(m.Content, "!help") {
 		go Help(s, m)
 	} else if m.Content == "!colors" {
 		go ColorsList(s, m)
