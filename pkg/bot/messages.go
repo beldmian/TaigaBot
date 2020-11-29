@@ -27,12 +27,14 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if err != nil {
 			SendErrorMessage(s, err)
 		}
-		if role.Permissions & 8192 == 8192 || role.Permissions & 8 == 8 {
+		if role.Permissions&8192 == 8192 || role.Permissions&8 == 8 {
 			premit = true
 			break
 		}
 	}
-	if !premit {return}
+	if !premit {
+		return
+	}
 	count, err := strconv.Atoi(strings.Split(m.Content, " ")[1])
 	if err != nil {
 		SendErrorMessage(s, err)
@@ -52,7 +54,7 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if err != nil {
 		SendErrorMessage(s, err)
 	}
-	time.Sleep(time.Second*5)
+	time.Sleep(time.Second * 5)
 	s.ChannelMessageDelete(m.ChannelID, msg.ID)
 }
 
@@ -120,7 +122,7 @@ func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 			if err != nil {
 				SendErrorMessage(s, err)
 			}
-			time.Sleep(time.Second*5)
+			time.Sleep(time.Second * 5)
 			s.ChannelMessageDelete(m.ChannelID, msg.ID)
 		} else {
 			for _, colorRole := range m.Member.Roles {
@@ -143,12 +145,14 @@ func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if err != nil {
 			SendErrorMessage(s, err)
 		}
-		if role.Permissions & 268435456 == 268435456 || role.Permissions & 8 == 8 {
+		if role.Permissions&268435456 == 268435456 || role.Permissions&8 == 8 {
 			premit = true
 			break
 		}
 	}
-	if !premit {return}
+	if !premit {
+		return
+	}
 	role := m.MentionRoles[0]
 	isUserHaveRole := false
 	for _, userRole := range m.Member.Roles {
@@ -183,25 +187,25 @@ func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 	command := strings.Split(m.Content, " ")
 	search := strings.Join(command[1:cap(command)], "%20")
-	resp, err := http.Get("https://shikimori.one/api/animes?search="+search+"&limit=10&order=ranked")
+	resp, err := http.Get("https://shikimori.one/api/animes?search=" + search + "&limit=10&order=ranked")
 	if err != nil {
 		SendErrorMessage(s, err)
 	}
 	var result []map[string]interface{}
 	json.NewDecoder(resp.Body).Decode(&result)
 	id := strconv.Itoa(int(result[0]["id"].(float64)))
-	respNew, err := http.Get("https://shikimori.one/api/animes/"+id)
+	respNew, err := http.Get("https://shikimori.one/api/animes/" + id)
 	if err != nil {
 		SendErrorMessage(s, err)
 	}
 	var resultDetail map[string]interface{}
 	json.NewDecoder(respNew.Body).Decode(&resultDetail)
 	embed := &discordgo.MessageEmbed{
-		Title: resultDetail["russian"].(string),
-		URL: "https://plashiki.su/anime/"+id,
+		Title:       resultDetail["russian"].(string),
+		URL:         "https://plashiki.su/anime/" + id,
 		Description: resultDetail["description"].(string),
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
-			URL: "https://shikimori.one"+resultDetail["image"].(map[string]interface{})["preview"].(string),
+			URL: "https://shikimori.one" + resultDetail["image"].(map[string]interface{})["preview"].(string),
 		},
 	}
 	s.ChannelMessageSendEmbed(m.ChannelID, embed)
@@ -211,25 +215,25 @@ func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 	common := []*discordgo.MessageEmbedField{
 		{
-			Name: "`!help`",
+			Name:  "`!help`",
 			Value: "Список команд бота",
 		},
 		{
-			Name: "`!colors`",
+			Name:  "`!colors`",
 			Value: "Список доступниых цветов",
 		},
 		{
-			Name: "`!color <номер цвета>`",
+			Name:  "`!color <номер цвета>`",
 			Value: "Выдает вам этот цвет",
 		},
 	}
 	moderation := []*discordgo.MessageEmbedField{
 		{
-			Name: "`!delete <число сообщений>`",
+			Name:  "`!delete <число сообщений>`",
 			Value: "Удаляет сообщения",
 		},
 		{
-			Name: "`!massrole @<роль>`",
+			Name:  "`!massrole @<роль>`",
 			Value: "Выдает или забирает роль у всех на сервере",
 		},
 	}
@@ -242,7 +246,7 @@ func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Title: "Комманды бота",
+		Title:  "Комманды бота",
 		Fields: fields,
 	})
 }
