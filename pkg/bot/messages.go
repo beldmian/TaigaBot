@@ -26,6 +26,7 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 		role, err := s.State.Role(m.GuildID, role)
 		if err != nil {
 			SendErrorMessage(s, err)
+			return
 		}
 		if role.Permissions & 8192 == 8192 || role.Permissions & 8 == 8 {
 			premit = true
@@ -36,10 +37,12 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 	count, err := strconv.Atoi(strings.Split(m.Content, " ")[1])
 	if err != nil {
 		SendErrorMessage(s, err)
+		return
 	}
 	messages, err := s.ChannelMessages(m.ChannelID, count+1, "", "", "")
 	if err != nil {
 		SendErrorMessage(s, err)
+		return
 	}
 	var ids []string
 	for _, message := range messages {
@@ -47,10 +50,12 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	if err := s.ChannelMessagesBulkDelete(m.ChannelID, ids); err != nil {
 		SendErrorMessage(s, err)
+		return
 	}
 	msg, err := s.ChannelMessageSend(m.ChannelID, "Успешно удалено "+strconv.Itoa(count)+" сообщений")
 	if err != nil {
 		SendErrorMessage(s, err)
+		return
 	}
 	time.Sleep(time.Second*5)
 	s.ChannelMessageDelete(m.ChannelID, msg.ID)
@@ -93,10 +98,12 @@ func ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 	buf := new(bytes.Buffer)
 	if err := png.Encode(buf, img); err != nil {
 		SendErrorMessage(s, err)
+		return
 	}
 
 	if _, err := s.ChannelFileSend(m.ChannelID, "Colors.png", buf); err != nil {
 		SendErrorMessage(s, err)
+		return
 	}
 }
 
@@ -115,10 +122,12 @@ func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if role.Name == userColor {
 			if err := s.GuildMemberRoleAdd(m.GuildID, m.Author.ID, role.ID); err != nil {
 				SendErrorMessage(s, err)
+				return
 			}
 			msg, err := s.ChannelMessageSend(m.ChannelID, "Цвет успешно изменен")
 			if err != nil {
 				SendErrorMessage(s, err)
+				return
 			}
 			time.Sleep(time.Second*5)
 			s.ChannelMessageDelete(m.ChannelID, msg.ID)
@@ -127,6 +136,7 @@ func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 				if colorRole == role.ID {
 					if err := s.GuildMemberRoleRemove(m.GuildID, m.Author.ID, colorRole); err != nil {
 						SendErrorMessage(s, err)
+						return
 					}
 				}
 			}
@@ -142,6 +152,7 @@ func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 		role, err := s.State.Role(m.GuildID, role)
 		if err != nil {
 			SendErrorMessage(s, err)
+			return
 		}
 		if role.Permissions & 268435456 == 268435456 || role.Permissions & 8 == 8 {
 			premit = true
@@ -160,22 +171,26 @@ func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 	members, err := s.GuildMembers(m.GuildID, "", 1000)
 	if err != nil {
 		SendErrorMessage(s, err)
+		return
 	}
 	if !isUserHaveRole {
 		for _, member := range members {
 			if err := s.GuildMemberRoleAdd(m.GuildID, member.User.ID, role); err != nil {
 				SendErrorMessage(s, err)
+				return
 			}
 		}
 	} else {
 		for _, member := range members {
 			if err := s.GuildMemberRoleRemove(m.GuildID, member.User.ID, role); err != nil {
 				SendErrorMessage(s, err)
+				return
 			}
 		}
 	}
 	if _, err := s.ChannelMessageSend(m.ChannelID, "Done!"); err != nil {
 		SendErrorMessage(s, err)
+		return
 	}
 }
 
@@ -186,6 +201,7 @@ func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 	resp, err := http.Get("https://shikimori.one/api/animes?search="+search+"&limit=10&order=ranked")
 	if err != nil {
 		SendErrorMessage(s, err)
+		return
 	}
 	var result []map[string]interface{}
 	json.NewDecoder(resp.Body).Decode(&result)
@@ -193,6 +209,7 @@ func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 	respNew, err := http.Get("https://shikimori.one/api/animes/"+id)
 	if err != nil {
 		SendErrorMessage(s, err)
+		return
 	}
 	var resultDetail map[string]interface{}
 	json.NewDecoder(respNew.Body).Decode(&resultDetail)
