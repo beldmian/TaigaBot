@@ -293,13 +293,53 @@ func Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
 			SendErrorMessage(s, err)
 			return
 		}
+		if task.Done && time.Now().Sub(task.Date) > 720*time.Hour {
+			if _, err := client.Database("tasker").Collection("tasks").DeleteOne(ctx, bson.M{"title": task.Title});err != nil {
+				SendErrorMessage(s, err)
+				return
+			}
+		}
 		tasks = append(tasks, task)
+	}
+	if len(tasks) == 0 {
+		s.ChannelMessageSend(m.ChannelID, "No tasks crated yet")
+		return
 	}
 	for _, task := range tasks {
 		if task.Done {
-			s.ChannelMessageSend(m.ChannelID, "~~"+ task.Date.Local().Format("01.02.2006") + " " + task.Title + "~~")
+			s.ChannelMessageSend(m.ChannelID, "~~"+ task.Date.Local().Format("02.01.2006") + " " + task.Title + "~~")
 		} else {
-			s.ChannelMessageSend(m.ChannelID, "**"+ task.Date.Local().Format("01.02.2006") + "** " + task.Title)
+			s.ChannelMessageSend(m.ChannelID, "**"+ task.Date.Local().Format("02.01.2006") + "** " + task.Title)
 		}
+	}
+}
+
+// TaskAdd provide handler for !task add command
+func TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
+	command := strings.Split(m.Content, " ")
+	date, err := time.Parse("02.01.2006",command[2])
+	if err != nil {
+		SendErrorMessage(s, err)
+		return
+	}
+	title := strings.Join(command[3:cap(command)], " ")
+
+	client, err := datebase.Connect()
+	if err != nil {
+		SendErrorMessage(s, err)
+		return
+	}
+	task := types.Task{
+		Title: title,
+		Date: date,
+		Done: false,
+		UserID: m.Author.ID,
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if _, err := client.Database("tasker").Collection("tasks").InsertOne(ctx, task); err != nil {
+		SendErrorMessage(s, err)
+		return
 	}
 }

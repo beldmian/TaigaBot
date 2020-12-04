@@ -21,6 +21,8 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go GetAnime(s, m)
 	} else if m.Content == "!tasks" {
 		go Tasks(s, m)
+	} else if strings.HasPrefix(m.Content, "!task add ") {
+		go TaskAdd(s, m)
 	}
 }
 
