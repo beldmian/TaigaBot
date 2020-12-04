@@ -306,7 +306,7 @@ func Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 		if task.Done && time.Now().Sub(task.Date) > 720*time.Hour {
-			if _, err := client.Database("tasker").Collection("tasks").DeleteOne(ctx, bson.M{"title": task.Title});err != nil {
+			if _, err := client.Database("tasker").Collection("tasks").DeleteOne(ctx, bson.M{"title": task.Title}); err != nil {
 				SendErrorMessage(s, err)
 				return
 			}
@@ -319,9 +319,9 @@ func Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	for _, task := range tasks {
 		if task.Done {
-			s.ChannelMessageSend(m.ChannelID, "~~"+ task.Date.Local().Format("02.01.2006") + " " + task.Title + "~~")
+			s.ChannelMessageSend(m.ChannelID, "~~"+task.Date.Local().Format("02.01.2006")+" "+task.Title+"~~")
 		} else {
-			s.ChannelMessageSend(m.ChannelID, "**"+ task.Date.Local().Format("02.01.2006") + "** " + task.Title)
+			s.ChannelMessageSend(m.ChannelID, "**"+task.Date.Local().Format("02.01.2006")+"** "+task.Title)
 		}
 	}
 }
@@ -329,7 +329,7 @@ func Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
 // TaskAdd provide handler for !task add command
 func TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
 	command := strings.Split(m.Content, " ")
-	date, err := time.Parse("02.01.2006",command[2])
+	date, err := time.Parse("02.01.2006", command[2])
 	if err != nil {
 		SendErrorMessage(s, err)
 		return
@@ -342,9 +342,9 @@ func TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 	task := types.Task{
-		Title: title,
-		Date: date,
-		Done: false,
+		Title:  title,
+		Date:   date,
+		Done:   false,
 		UserID: m.Author.ID,
 	}
 
@@ -360,7 +360,7 @@ func TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
 // TaskDone provide handler for !task add command
 func TaskDone(s *discordgo.Session, m *discordgo.MessageCreate) {
 	command := strings.Split(m.Content, " ")
-	date, err := time.Parse("02.01.2006",command[2])
+	date, err := time.Parse("02.01.2006", command[2])
 	if err != nil {
 		SendErrorMessage(s, err)
 		return
@@ -372,7 +372,7 @@ func TaskDone(s *discordgo.Session, m *discordgo.MessageCreate) {
 		SendErrorMessage(s, err)
 		return
 	}
-	if _, err := client.Database("tasker").Collection("tasks").UpdateMany(ctx, bson.M{"date": date}, bson.M{"$set": bson.M{"done": true} }); err != nil {
+	if _, err := client.Database("tasker").Collection("tasks").UpdateMany(ctx, bson.M{"date": date}, bson.M{"$set": bson.M{"done": true}}); err != nil {
 		SendErrorMessage(s, err)
 		return
 	}
