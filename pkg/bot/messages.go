@@ -246,6 +246,18 @@ func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 			Name:  "`!color <номер цвета>`",
 			Value: "Выдает вам этот цвет",
 		},
+		{
+			Name:  "`!tasks`",
+			Value: "Выдает список заданий",
+		},
+		{
+			Name:  "`!task add <дата 01.02.2020> <текст задания>`",
+			Value: "Добавляет вам задание",
+		},
+		{
+			Name:  "`!task done <дата 01.02.2020>`",
+			Value: "Отмечает сделанными все задания на данную дату",
+		},
 	}
 	moderation := []*discordgo.MessageEmbedField{
 		{
@@ -342,4 +354,27 @@ func TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
 		SendErrorMessage(s, err)
 		return
 	}
+	s.ChannelMessageSend(m.ChannelID, "Успешно добавлено")
+}
+
+// TaskDone provide handler for !task add command
+func TaskDone(s *discordgo.Session, m *discordgo.MessageCreate) {
+	command := strings.Split(m.Content, " ")
+	date, err := time.Parse("02.01.2006",command[2])
+	if err != nil {
+		SendErrorMessage(s, err)
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := datebase.Connect()
+	if err != nil {
+		SendErrorMessage(s, err)
+		return
+	}
+	if _, err := client.Database("tasker").Collection("tasks").UpdateMany(ctx, bson.M{"date": date}, bson.M{"$set": bson.M{"done": true} }); err != nil {
+		SendErrorMessage(s, err)
+		return
+	}
+	s.ChannelMessageSend(m.ChannelID, "Успешно сделано")
 }

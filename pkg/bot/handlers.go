@@ -23,6 +23,8 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go Tasks(s, m)
 	} else if strings.HasPrefix(m.Content, "!task add ") {
 		go TaskAdd(s, m)
+	} else if strings.HasPrefix(m.Content, "!task done ") {
+		go TaskDone(s, m)
 	}
 }
 
