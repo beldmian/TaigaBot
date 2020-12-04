@@ -19,6 +19,8 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go MassRole(s, m)
 	} else if strings.HasPrefix(m.Content, "!anime ") {
 		go GetAnime(s, m)
+	} else if m.Content == "!tasks" {
+		go Tasks(s, m)
 	}
 }
 

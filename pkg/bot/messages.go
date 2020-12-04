@@ -2,6 +2,7 @@ package bot
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"image"
@@ -12,7 +13,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/beldmian/TaigaBot/pkg/types"
 	"github.com/bwmarrin/discordgo"
+	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/goregular"
 	"golang.org/x/image/font/opentype"
@@ -262,4 +265,37 @@ func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 		Title: "Комманды бота",
 		Fields: fields,
 	})
+}
+
+// Tasks provides handler for !tasks command
+func Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
+	client, err := datebase.Connect()
+	if err != nil {
+		SendErrorMessage(s, err)
+		return
+	}
+	filter := bson.M{"user_id": m.Author.ID}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cursor, err := client.Database("tasker").Collection("tasks").Find(ctx, filter)
+	if err != nil {
+		SendErrorMessage(s, err)
+		return
+	}
+	var tasks []types.Task
+	for cursor.Next(ctx) {
+		var task types.Task
+		if err := cursor.Decode(&task); err != nil {
+			SendErrorMessage(s, err)
+			return
+		}
+		tasks = append(tasks, task)
+	}
+	for _, task := range tasks {
+		if task.Done {
+			s.ChannelMessageSend(m.ChannelID, "~~"+ task.Date.Local().Format("01.02.2006") + " " + task.Title + "~~")
+		} else {
+			s.ChannelMessageSend(m.ChannelID, "**"+ task.Date.Local().Format("01.02.2006") + "** " + task.Title)
+		}
+	}
 }
