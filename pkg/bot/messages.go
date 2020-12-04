@@ -297,9 +297,9 @@ func Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	for _, task := range tasks {
 		if task.Done {
-			s.ChannelMessageSend(m.ChannelID, "~~"+ task.Date.Local().Format("01.02.2006") + " " + task.Title + "~~")
+			s.ChannelMessageSend(m.ChannelID, "~~"+task.Date.Local().Format("01.02.2006")+" "+task.Title+"~~")
 		} else {
-			s.ChannelMessageSend(m.ChannelID, "**"+ task.Date.Local().Format("01.02.2006") + "** " + task.Title)
+			s.ChannelMessageSend(m.ChannelID, "**"+task.Date.Local().Format("01.02.2006")+"** "+task.Title)
 		}
 	}
 }

@@ -12,7 +12,6 @@ var logsID string
 var discord *discordgo.Session
 var datebase db.DB
 
-
 // InitBot initializes bot process
 func InitBot() {
 	token, exists := os.LookupEnv("TOKEN")
@@ -32,7 +31,7 @@ func InitBot() {
 	discord.AddHandler(OnMessage)
 	discord.AddHandler(OnBan)
 	discord.AddHandler(OnMemberRemove)
-	
+
 	if err := discord.Open(); err != nil {
 		log.Fatal(err)
 	}
