@@ -7,23 +7,24 @@ import (
 
 // OnMessage provide handler for MessageCreate event
 func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if strings.HasPrefix(m.Content, "!help") {
+	content := strings.ToLower(m.Content)
+	if strings.HasPrefix(content, "!help") {
 		go Help(s, m)
-	} else if m.Content == "!colors" {
+	} else if content == "!colors" {
 		go ColorsList(s, m)
-	} else if strings.HasPrefix(m.Content, "!color ") {
+	} else if strings.HasPrefix(content, "!color ") {
 		go PickColor(s, m)
-	} else if strings.HasPrefix(m.Content, "!delete ") {
+	} else if strings.HasPrefix(content, "!delete ") {
 		go BulkDelete(s, m)
-	} else if strings.HasPrefix(m.Content, "!massrole ") {
+	} else if strings.HasPrefix(content, "!massrole ") {
 		go MassRole(s, m)
-	} else if strings.HasPrefix(m.Content, "!anime ") {
+	} else if strings.HasPrefix(content, "!anime ") {
 		go GetAnime(s, m)
-	} else if m.Content == "!tasks" {
+	} else if content == "!tasks" {
 		go Tasks(s, m)
-	} else if strings.HasPrefix(m.Content, "!task add ") {
+	} else if strings.HasPrefix(content, "!task add ") {
 		go TaskAdd(s, m)
-	} else if strings.HasPrefix(m.Content, "!task done ") {
+	} else if strings.HasPrefix(content, "!task done ") {
 		go TaskDone(s, m)
 	}
 }
