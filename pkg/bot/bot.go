@@ -6,12 +6,13 @@ import (
 
 	"github.com/beldmian/TaigaBot/pkg/db"
 	"github.com/bwmarrin/discordgo"
+	"go.uber.org/zap"
 )
 
 var logsID string
 var discord *discordgo.Session
 var datebase db.DB
-
+var logger *zap.Logger
 
 // InitBot initializes bot process
 func InitBot() {
@@ -29,10 +30,13 @@ func InitBot() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	loggerConfig := zap.NewProductionConfig()
+	loggerConfig.OutputPaths = []string{"stdout", "/tmp/logs"}
+	logger, _ = loggerConfig.Build()
 	discord.AddHandler(OnMessage)
 	discord.AddHandler(OnBan)
-	discord.AddHandler(OnMemberRemove)
-	
+
+	logger.Info("Bot started")
 	if err := discord.Open(); err != nil {
 		log.Fatal(err)
 	}
@@ -41,6 +45,6 @@ func InitBot() {
 // StopBot stops the bot session
 func StopBot() {
 	if err := discord.Close(); err != nil {
-		log.Fatal(err)
+		logger.Fatal("Error on closeing session", zap.Error(err))
 	}
 }
