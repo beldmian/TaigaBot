@@ -1,7 +1,7 @@
 .PHONY=run
 run:
-	go build && ./TaigaBot
+	docker run --env-file ./env taiga_bot:latest 
 
 .PHONY=build
 build:
-	go build -o main
+	docker build . -t taiga_bot:latest
