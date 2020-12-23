@@ -2,6 +2,7 @@ package bot
 
 import (
 	"log"
+	"os"
 
 	"github.com/beldmian/TaigaBot/pkg/db"
 	"github.com/beldmian/TaigaBot/pkg/types"
@@ -19,10 +20,26 @@ type Bot struct {
 
 // InitBot initializes bot process
 func InitBot(config types.Config) *Bot {
-	token := config.Bot.Token
-	logsID := config.Bot.LogsID
-	datebase := db.DB{
-		DbURL: config.Bot.DBURI,
+	var token string
+	var logsID string
+	var datebase db.DB
+	if config.Production {
+		dbURI, exists := os.LookupEnv("DB_URI")
+		token, exists = os.LookupEnv("TOKEN")
+		logsID, exists = os.LookupEnv("LOGS_ID")
+		if !exists {
+			log.Print("No token or logs channel ID provided")
+			return nil
+		}
+		datebase = db.DB{
+			DbURL: dbURI,
+		}
+	} else {
+		token = config.Bot.Token
+		logsID = config.Bot.LogsID
+		datebase = db.DB{
+			DbURL: config.Bot.DBURI,
+		}
 	}
 	discord, err := discordgo.New("Bot " + token)
 	if err != nil {

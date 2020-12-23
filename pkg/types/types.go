@@ -14,7 +14,8 @@ type Task struct {
 
 // Config provide struct for config of bot
 type Config struct {
-	Bot BotConfig
+	Production bool `toml:"prod"`
+	Bot        BotConfig
 }
 
 // BotConfig provide struct for bot config
