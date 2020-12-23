@@ -22,13 +22,13 @@ import (
 )
 
 // BulkDelete provides handler for !delete command
-func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 	roles := m.Member.Roles
 	premit := false
 	for _, role := range roles {
 		role, err := s.State.Role(m.GuildID, role)
 		if err != nil {
-			SendErrorMessage(s, err)
+			bot.SendErrorMessage(s, err)
 			return
 		}
 		if role.Permissions&8192 == 8192 || role.Permissions&8 == 8 {
@@ -41,12 +41,12 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	count, err := strconv.Atoi(strings.Split(m.Content, " ")[1])
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	messages, err := s.ChannelMessages(m.ChannelID, count+1, "", "", "")
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	var ids []string
@@ -54,12 +54,12 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 		ids = append(ids, message.ID)
 	}
 	if err := s.ChannelMessagesBulkDelete(m.ChannelID, ids); err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	msg, err := s.ChannelMessageSend(m.ChannelID, "Успешно удалено "+strconv.Itoa(count)+" сообщений")
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	time.Sleep(time.Second * 5)
@@ -67,7 +67,7 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // ColorsList provides handler for !colors command
-func ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 	roles, _ := s.GuildRoles(m.GuildID)
 	var colors []color.RGBA
 	for _, role := range roles {
@@ -102,18 +102,18 @@ func ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	buf := new(bytes.Buffer)
 	if err := png.Encode(buf, img); err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 
 	if _, err := s.ChannelFileSend(m.ChannelID, "Colors.png", buf); err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 }
 
 // PickColor provides handler for !color command
-func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 	userColor := strings.Split(m.Content, " ")[1]
 	roles, _ := s.GuildRoles(m.GuildID)
 	var colorRoles discordgo.Roles
@@ -126,12 +126,12 @@ func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 	for _, role := range colorRoles {
 		if role.Name == userColor {
 			if err := s.GuildMemberRoleAdd(m.GuildID, m.Author.ID, role.ID); err != nil {
-				SendErrorMessage(s, err)
+				bot.SendErrorMessage(s, err)
 				return
 			}
 			msg, err := s.ChannelMessageSend(m.ChannelID, "Цвет успешно изменен")
 			if err != nil {
-				SendErrorMessage(s, err)
+				bot.SendErrorMessage(s, err)
 				return
 			}
 			time.Sleep(time.Second * 5)
@@ -140,7 +140,7 @@ func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 			for _, colorRole := range m.Member.Roles {
 				if colorRole == role.ID {
 					if err := s.GuildMemberRoleRemove(m.GuildID, m.Author.ID, colorRole); err != nil {
-						SendErrorMessage(s, err)
+						bot.SendErrorMessage(s, err)
 						return
 					}
 				}
@@ -150,13 +150,13 @@ func PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // MassRole provides handler for !massrole command
-func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 	roles := m.Member.Roles
 	premit := false
 	for _, role := range roles {
 		role, err := s.State.Role(m.GuildID, role)
 		if err != nil {
-			SendErrorMessage(s, err)
+			bot.SendErrorMessage(s, err)
 			return
 		}
 		if role.Permissions&268435456 == 268435456 || role.Permissions&8 == 8 {
@@ -177,37 +177,37 @@ func MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	members, err := s.GuildMembers(m.GuildID, "", 1000)
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	if !isUserHaveRole {
 		for _, member := range members {
 			if err := s.GuildMemberRoleAdd(m.GuildID, member.User.ID, role); err != nil {
-				SendErrorMessage(s, err)
+				bot.SendErrorMessage(s, err)
 				return
 			}
 		}
 	} else {
 		for _, member := range members {
 			if err := s.GuildMemberRoleRemove(m.GuildID, member.User.ID, role); err != nil {
-				SendErrorMessage(s, err)
+				bot.SendErrorMessage(s, err)
 				return
 			}
 		}
 	}
 	if _, err := s.ChannelMessageSend(m.ChannelID, "Done!"); err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 }
 
 // GetAnime provides handler for !anime command
-func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 	command := strings.Split(m.Content, " ")
 	search := strings.Join(command[1:cap(command)], "%20")
 	resp, err := http.Get("https://shikimori.one/api/animes?search=" + search + "&limit=10&order=ranked")
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	var result []map[string]interface{}
@@ -215,7 +215,7 @@ func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 	id := strconv.Itoa(int(result[0]["id"].(float64)))
 	respNew, err := http.Get("https://shikimori.one/api/animes/" + id)
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	var resultDetail map[string]interface{}
@@ -232,7 +232,7 @@ func GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // Help provides handler for !help command
-func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 	common := []*discordgo.MessageEmbedField{
 		{
 			Name:  "`!help`",
@@ -284,10 +284,10 @@ func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // Tasks provides handler for !tasks command
-func Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
-	client, err := datebase.Connect()
+func (bot *Bot) Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
+	client, err := bot.DB.Connect()
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	filter := bson.M{"user_id": m.Author.ID}
@@ -295,19 +295,19 @@ func Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
 	defer cancel()
 	cursor, err := client.Database("tasker").Collection("tasks").Find(ctx, filter)
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	var tasks []types.Task
 	for cursor.Next(ctx) {
 		var task types.Task
 		if err := cursor.Decode(&task); err != nil {
-			SendErrorMessage(s, err)
+			bot.SendErrorMessage(s, err)
 			return
 		}
 		if task.Done && time.Now().Sub(task.Date) > 720*time.Hour {
 			if _, err := client.Database("tasker").Collection("tasks").DeleteOne(ctx, bson.M{"title": task.Title}); err != nil {
-				SendErrorMessage(s, err)
+				bot.SendErrorMessage(s, err)
 				return
 			}
 		}
@@ -327,18 +327,18 @@ func Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // TaskAdd provide handler for !task add command
-func TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
 	command := strings.Split(m.Content, " ")
 	date, err := time.Parse("02.01.2006", command[2])
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	title := strings.Join(command[3:cap(command)], " ")
 
-	client, err := datebase.Connect()
+	client, err := bot.DB.Connect()
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	task := types.Task{
@@ -351,29 +351,29 @@ func TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if _, err := client.Database("tasker").Collection("tasks").InsertOne(ctx, task); err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	s.ChannelMessageSend(m.ChannelID, "Успешно добавлено")
 }
 
 // TaskDone provide handler for !task add command
-func TaskDone(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) TaskDone(s *discordgo.Session, m *discordgo.MessageCreate) {
 	command := strings.Split(m.Content, " ")
 	date, err := time.Parse("02.01.2006", command[2])
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := datebase.Connect()
+	client, err := bot.DB.Connect()
 	if err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	if _, err := client.Database("tasker").Collection("tasks").UpdateMany(ctx, bson.M{"date": date}, bson.M{"$set": bson.M{"done": true}}); err != nil {
-		SendErrorMessage(s, err)
+		bot.SendErrorMessage(s, err)
 		return
 	}
 	s.ChannelMessageSend(m.ChannelID, "Успешно сделано")

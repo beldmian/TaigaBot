@@ -39,9 +39,9 @@ func AddLabel(img *image.RGBA, bg color.RGBA, x, y int, label string, face font.
 }
 
 // SendErrorMessage ...
-func SendErrorMessage(s *discordgo.Session, err error) {
-	logger.Warn("Message error", zap.Error(err))
-	s.ChannelMessageSendEmbed(logsID, &discordgo.MessageEmbed{
+func (bot *Bot) SendErrorMessage(s *discordgo.Session, err error) {
+	bot.Logger.Warn("Message error", zap.Error(err))
+	s.ChannelMessageSendEmbed(bot.LogsID, &discordgo.MessageEmbed{
 		Title:       "Internal error occured",
 		Description: "Error trace: " + err.Error(),
 		Color:       2394819,

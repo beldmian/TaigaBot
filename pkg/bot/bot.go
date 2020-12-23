@@ -2,29 +2,27 @@ package bot
 
 import (
 	"log"
-	"os"
 
 	"github.com/beldmian/TaigaBot/pkg/db"
+	"github.com/beldmian/TaigaBot/pkg/types"
 	"github.com/bwmarrin/discordgo"
 	"go.uber.org/zap"
 )
 
-var logsID string
-var discord *discordgo.Session
-var datebase db.DB
-var logger *zap.Logger
+// Bot provide struct for bot
+type Bot struct {
+	Session *discordgo.Session
+	DB      *db.DB
+	LogsID  string
+	Logger  *zap.Logger
+}
 
 // InitBot initializes bot process
-func InitBot() {
-	token, exists := os.LookupEnv("TOKEN")
-	logsID, exists = os.LookupEnv("LOGS_ID")
-	dbURI, exists := os.LookupEnv("DB_URI")
-	if !exists {
-		log.Print("No token or logs channel ID provided")
-		return
-	}
-	datebase = db.DB{
-		DbURL: dbURI,
+func InitBot(config types.Config) *Bot {
+	token := config.Bot.Token
+	logsID := config.Bot.LogsID
+	datebase := db.DB{
+		DbURL: config.Bot.DBURI,
 	}
 	discord, err := discordgo.New("Bot " + token)
 	if err != nil {
@@ -32,19 +30,29 @@ func InitBot() {
 	}
 	loggerConfig := zap.NewProductionConfig()
 	loggerConfig.OutputPaths = []string{"stdout", "/tmp/logs"}
-	logger, _ = loggerConfig.Build()
-	discord.AddHandler(OnMessage)
-	discord.AddHandler(OnBan)
+	logger, _ := loggerConfig.Build()
+
+	bot := Bot{
+		Session: discord,
+		DB:      &datebase,
+		LogsID:  logsID,
+		Logger:  logger,
+	}
+
+	bot.Session.AddHandler(bot.OnMessage)
+	bot.Session.AddHandler(bot.OnBan)
 
 	logger.Info("Bot started")
-	if err := discord.Open(); err != nil {
+	if err := bot.Session.Open(); err != nil {
 		log.Fatal(err)
 	}
+
+	return &bot
 }
 
 // StopBot stops the bot session
-func StopBot() {
-	if err := discord.Close(); err != nil {
-		logger.Fatal("Error on closeing session", zap.Error(err))
+func (bot *Bot) StopBot() {
+	if err := bot.Session.Close(); err != nil {
+		bot.Logger.Fatal("Error on closeing session", zap.Error(err))
 	}
 }
