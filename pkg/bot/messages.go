@@ -80,7 +80,7 @@ func (bot *Bot) ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	colorsCount := len(colors)
 	width := 600
-	height := (colorsCount/7 + 1) * 100
+	height := ((colorsCount+1)/7 + 1) * 100
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
