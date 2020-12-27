@@ -26,7 +26,7 @@ export function Navbar() {
                 <Typography variant="h6" className={classes.title}>
                     TaigaBot
                 </Typography>
-                <Button color="inherit" href="https://discord.com/api/oauth2/authorize?client_id=669156162473689088&permissions=469924912&scope=bot">Add to server</Button>
+                <Button color="inherit" href="https://discord.com/api/oauth2/authorize?client_id=780455940566024192&permissions=470023280&scope=bot">Add to server</Button>
             </Toolbar>
         </AppBar>
     )
