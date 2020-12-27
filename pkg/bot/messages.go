@@ -247,6 +247,10 @@ func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 			Value: "Выдает вам этот цвет",
 		},
 		{
+			Name:  "`!anime <название>`",
+			Value: "Ищет аниме по его названию",
+		},
+		{
 			Name:  "`!tasks`",
 			Value: "Выдает список заданий",
 		},
