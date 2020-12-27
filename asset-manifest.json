@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/static/css/main.5e9969a2.chunk.css",
-    "main.js": "/static/js/main.2703b934.chunk.js",
-    "main.js.map": "/static/js/main.2703b934.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.a93dff89.js",
-    "runtime-main.js.map": "/static/js/runtime-main.a93dff89.js.map",
-    "static/js/2.42d57628.chunk.js": "/static/js/2.42d57628.chunk.js",
-    "static/js/2.42d57628.chunk.js.map": "/static/js/2.42d57628.chunk.js.map",
-    "static/js/3.f6725e8e.chunk.js": "/static/js/3.f6725e8e.chunk.js",
-    "static/js/3.f6725e8e.chunk.js.map": "/static/js/3.f6725e8e.chunk.js.map",
-    "index.html": "/index.html",
-    "static/css/main.5e9969a2.chunk.css.map": "/static/css/main.5e9969a2.chunk.css.map",
-    "static/js/2.42d57628.chunk.js.LICENSE.txt": "/static/js/2.42d57628.chunk.js.LICENSE.txt"
+    "main.css": "/TaigaBot/static/css/main.5e9969a2.chunk.css",
+    "main.js": "/TaigaBot/static/js/main.2703b934.chunk.js",
+    "main.js.map": "/TaigaBot/static/js/main.2703b934.chunk.js.map",
+    "runtime-main.js": "/TaigaBot/static/js/runtime-main.d2371050.js",
+    "runtime-main.js.map": "/TaigaBot/static/js/runtime-main.d2371050.js.map",
+    "static/js/2.42d57628.chunk.js": "/TaigaBot/static/js/2.42d57628.chunk.js",
+    "static/js/2.42d57628.chunk.js.map": "/TaigaBot/static/js/2.42d57628.chunk.js.map",
+    "static/js/3.f6725e8e.chunk.js": "/TaigaBot/static/js/3.f6725e8e.chunk.js",
+    "static/js/3.f6725e8e.chunk.js.map": "/TaigaBot/static/js/3.f6725e8e.chunk.js.map",
+    "index.html": "/TaigaBot/index.html",
+    "static/css/main.5e9969a2.chunk.css.map": "/TaigaBot/static/css/main.5e9969a2.chunk.css.map",
+    "static/js/2.42d57628.chunk.js.LICENSE.txt": "/TaigaBot/static/js/2.42d57628.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.a93dff89.js",
+    "static/js/runtime-main.d2371050.js",
     "static/js/2.42d57628.chunk.js",
     "static/css/main.5e9969a2.chunk.css",
     "static/js/main.2703b934.chunk.js"
