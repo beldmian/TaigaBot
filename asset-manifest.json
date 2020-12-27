@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/TaigaBot/static/css/main.7436dcb2.chunk.css",
-    "main.js": "/TaigaBot/static/js/main.83393175.chunk.js",
-    "main.js.map": "/TaigaBot/static/js/main.83393175.chunk.js.map",
+    "main.js": "/TaigaBot/static/js/main.98fd1afc.chunk.js",
+    "main.js.map": "/TaigaBot/static/js/main.98fd1afc.chunk.js.map",
     "runtime-main.js": "/TaigaBot/static/js/runtime-main.8b701a19.js",
     "runtime-main.js.map": "/TaigaBot/static/js/runtime-main.8b701a19.js.map",
     "static/js/2.c9ef33b3.chunk.js": "/TaigaBot/static/js/2.c9ef33b3.chunk.js",
@@ -17,6 +17,6 @@
     "static/js/runtime-main.8b701a19.js",
     "static/js/2.c9ef33b3.chunk.js",
     "static/css/main.7436dcb2.chunk.css",
-    "static/js/main.83393175.chunk.js"
+    "static/js/main.98fd1afc.chunk.js"
   ]
 }
