@@ -357,3 +357,22 @@ func (bot *Bot) TaskDone(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	s.ChannelMessageSend(m.ChannelID, "Успешно сделано")
 }
+
+// Poll provide handler for !poll command
+func (bot *Bot) Poll(s *discordgo.Session, m *discordgo.MessageCreate) {
+	squares := []string{"\U0001F7E8", "\U0001F7E7", "\U0001F7E9", "\U0001F7EB", "\U0001F7EA", "\U0001F7E5", "\U0001F7E6"}
+	command := strings.Split(m.Content, " ")
+	variants := strings.Split(strings.Join(command[1:cap(command)], ""), "|")
+	variantsCount := len(variants)
+	variantsText := ""
+	for i, variant := range variants {
+		variantsText += squares[i] + " " + variant + "\n"
+	}
+	message, err := s.ChannelMessageSend(m.ChannelID, "Голосование:\n"+variantsText)
+	if err != nil {
+		bot.SendErrorMessage(s, err)
+	}
+	for _, square := range squares[:variantsCount] {
+		s.MessageReactionAdd(m.ChannelID, message.ID, square)
+	}
+}

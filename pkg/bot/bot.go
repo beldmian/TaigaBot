@@ -93,6 +93,13 @@ func (bot *Bot) initCommands() {
 			Moderation:  true,
 			Handler:     bot.MassRole,
 		},
+		{
+			Name:        "`!poll <вариант 1> | <вариант 2> ...",
+			Description: "Создает опрос с несколькими вариантами ответа",
+			Command:     "!poll ",
+			Moderation:  false,
+			Handler:     bot.Poll,
+		},
 	}
 
 	bot.Commands = commands
