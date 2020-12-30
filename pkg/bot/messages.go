@@ -233,45 +233,20 @@ func (bot *Bot) GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 // Help provides handler for !help command
 func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
-	common := []*discordgo.MessageEmbedField{
-		{
-			Name:  "`!help`",
-			Value: "Список команд бота",
-		},
-		{
-			Name:  "`!colors`",
-			Value: "Список доступниых цветов",
-		},
-		{
-			Name:  "`!color <номер цвета>`",
-			Value: "Выдает вам этот цвет",
-		},
-		{
-			Name:  "`!anime <название>`",
-			Value: "Ищет аниме по его названию",
-		},
-		{
-			Name:  "`!tasks`",
-			Value: "Выдает список заданий",
-		},
-		{
-			Name:  "`!task add <дата 01.02.2020> <текст задания>`",
-			Value: "Добавляет вам задание",
-		},
-		{
-			Name:  "`!task done <дата 01.02.2020>`",
-			Value: "Отмечает сделанными все задания на данную дату",
-		},
-	}
-	moderation := []*discordgo.MessageEmbedField{
-		{
-			Name:  "`!delete <число сообщений>`",
-			Value: "Удаляет сообщения",
-		},
-		{
-			Name:  "`!massrole @<роль>`",
-			Value: "Выдает или забирает роль у всех на сервере",
-		},
+	var common []*discordgo.MessageEmbedField
+	var moderation []*discordgo.MessageEmbedField
+	for _, command := range bot.Commands {
+		if command.Moderation {
+			moderation = append(moderation, &discordgo.MessageEmbedField{
+				Name:  command.Name,
+				Value: command.Description,
+			})
+		} else {
+			common = append(common, &discordgo.MessageEmbedField{
+				Name:  command.Name,
+				Value: command.Description,
+			})
+		}
 	}
 	fields := common
 	command := strings.Split(m.Content, " ")

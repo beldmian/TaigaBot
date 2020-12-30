@@ -12,10 +12,90 @@ import (
 
 // Bot provide struct for bot
 type Bot struct {
-	Session *discordgo.Session
-	DB      *db.DB
-	LogsID  string
-	Logger  *zap.Logger
+	Session  *discordgo.Session
+	DB       *db.DB
+	LogsID   string
+	Logger   *zap.Logger
+	Commands []Command
+}
+
+// Command provide struct for commands
+type Command struct {
+	Name        string
+	Description string
+	Command     string
+	Moderation  bool
+	Handler     func(s *discordgo.Session, m *discordgo.MessageCreate)
+}
+
+func (bot *Bot) initCommands() {
+	commands := []Command{
+		{
+			Name:        "`!help (moderation)`",
+			Description: "Список команд бота",
+			Command:     "!help",
+			Moderation:  false,
+			Handler:     bot.Help,
+		},
+		{
+			Name:        "`!colors`",
+			Description: "Список доступниых цветов",
+			Command:     "!colors",
+			Moderation:  false,
+			Handler:     bot.ColorsList,
+		},
+		{
+			Name:        "`!color <номер цвета>`",
+			Description: "Выдает вам этот цвет",
+			Command:     "!color ",
+			Moderation:  false,
+			Handler:     bot.PickColor,
+		},
+		{
+			Name:        "`!anime <название>`",
+			Description: "Ищет аниме по его названию",
+			Command:     "!anime ",
+			Moderation:  false,
+			Handler:     bot.GetAnime,
+		},
+		{
+			Name:        "`!tasks`",
+			Description: "Выдает список заданий",
+			Command:     "!tasks",
+			Moderation:  false,
+			Handler:     bot.Tasks,
+		},
+		{
+			Name:        "`!task add <дата 01.02.2020> <текст задания>`",
+			Description: "Добавляет вам задание",
+			Command:     "!task add ",
+			Moderation:  false,
+			Handler:     bot.TaskAdd,
+		},
+		{
+			Name:        "`!task done <дата 01.02.2020>`",
+			Description: "Отмечает сделанными все задания на данную дату",
+			Command:     "!task done ",
+			Moderation:  false,
+			Handler:     bot.TaskDone,
+		},
+		{
+			Name:        "`!delete <число сообщений>`",
+			Description: "Удаляет сообщения",
+			Command:     "!delete ",
+			Moderation:  true,
+			Handler:     bot.BulkDelete,
+		},
+		{
+			Name:        "`!massrole @<роль>`",
+			Description: "Выдает или забирает роль у всех на сервере",
+			Command:     "!massrole ",
+			Moderation:  true,
+			Handler:     bot.MassRole,
+		},
+	}
+
+	bot.Commands = commands
 }
 
 // InitBot initializes bot process
@@ -55,6 +135,8 @@ func InitBot(config types.Config) *Bot {
 		LogsID:  logsID,
 		Logger:  logger,
 	}
+
+	bot.initCommands()
 
 	bot.Session.AddHandler(bot.OnMessage)
 	bot.Session.AddHandler(bot.OnBan)
