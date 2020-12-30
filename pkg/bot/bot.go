@@ -126,7 +126,7 @@ func InitBot(config types.Config) *Bot {
 		log.Fatal(err)
 	}
 	loggerConfig := zap.NewProductionConfig()
-	loggerConfig.OutputPaths = []string{"stdout", "/tmp/logs"}
+	loggerConfig.OutputPaths = []string{"stdout", "./bot.log"}
 	logger, _ := loggerConfig.Build()
 
 	bot := Bot{
