@@ -23,22 +23,6 @@ import (
 
 // BulkDelete provides handler for !delete command
 func (bot *Bot) BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
-	roles := m.Member.Roles
-	premit := false
-	for _, role := range roles {
-		role, err := s.State.Role(m.GuildID, role)
-		if err != nil {
-			bot.SendErrorMessage(s, err)
-			return
-		}
-		if role.Permissions&8192 == 8192 || role.Permissions&8 == 8 {
-			premit = true
-			break
-		}
-	}
-	if !premit {
-		return
-	}
 	count, err := strconv.Atoi(strings.Split(m.Content, " ")[1])
 	if err != nil {
 		bot.SendErrorMessage(s, err)
@@ -151,20 +135,8 @@ func (bot *Bot) PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 // MassRole provides handler for !massrole command
 func (bot *Bot) MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
-	roles := m.Member.Roles
-	premit := false
-	for _, role := range roles {
-		role, err := s.State.Role(m.GuildID, role)
-		if err != nil {
-			bot.SendErrorMessage(s, err)
-			return
-		}
-		if role.Permissions&268435456 == 268435456 || role.Permissions&8 == 8 {
-			premit = true
-			break
-		}
-	}
-	if !premit {
+	if len(m.MentionRoles) == 0 {
+		s.ChannelMessageSend(m.ChannelID, "Отметьте роль в сообщении")
 		return
 	}
 	role := m.MentionRoles[0]
@@ -356,4 +328,23 @@ func (bot *Bot) TaskDone(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 	s.ChannelMessageSend(m.ChannelID, "Успешно сделано")
+}
+
+// Poll provide handler for !poll command
+func (bot *Bot) Poll(s *discordgo.Session, m *discordgo.MessageCreate) {
+	squares := []string{"\U0001F7E8", "\U0001F7E7", "\U0001F7E9", "\U0001F7EB", "\U0001F7EA", "\U0001F7E5", "\U0001F7E6"}
+	command := strings.Split(m.Content, " ")
+	variants := strings.Split(strings.Join(command[1:cap(command)], ""), "|")
+	variantsCount := len(variants)
+	variantsText := ""
+	for i, variant := range variants {
+		variantsText += squares[i] + " " + variant + "\n"
+	}
+	message, err := s.ChannelMessageSend(m.ChannelID, "Голосование:\n"+variantsText)
+	if err != nil {
+		bot.SendErrorMessage(s, err)
+	}
+	for _, square := range squares[:variantsCount] {
+		s.MessageReactionAdd(m.ChannelID, message.ID, square)
+	}
 }
