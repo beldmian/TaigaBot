@@ -228,10 +228,15 @@ func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 			fields = moderation
 		}
 	}
-	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+	ch, err := s.UserChannelCreate(m.Author.ID)
+	if err != nil {
+		bot.SendErrorMessage(s, err)
+	}
+	s.ChannelMessageSendEmbed(ch.ID, &discordgo.MessageEmbed{
 		Title:  "Комманды бота",
 		Fields: fields,
 	})
+	s.ChannelMessageSend(m.ChannelID, "Проверь личные сообщения")
 }
 
 // Tasks provides handler for !tasks command
