@@ -2,7 +2,6 @@ package bot
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"image"
@@ -15,7 +14,6 @@ import (
 
 	"github.com/beldmian/TaigaBot/pkg/types"
 	"github.com/bwmarrin/discordgo"
-	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/goregular"
 	"golang.org/x/image/font/opentype"
@@ -241,45 +239,25 @@ func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 // Tasks provides handler for !tasks command
 func (bot *Bot) Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
-	client, err := bot.DB.Connect()
+	tasks, err := bot.DB.GetTasks(m.Author.ID)
 	if err != nil {
 		bot.SendErrorMessage(s, err)
 		return
-	}
-	filter := bson.M{"user_id": m.Author.ID}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	cursor, err := client.Database("tasker").Collection("tasks").Find(ctx, filter)
-	if err != nil {
-		bot.SendErrorMessage(s, err)
-		return
-	}
-	var tasks []types.Task
-	for cursor.Next(ctx) {
-		var task types.Task
-		if err := cursor.Decode(&task); err != nil {
-			bot.SendErrorMessage(s, err)
-			return
-		}
-		if task.Done && time.Now().Sub(task.Date) > 720*time.Hour {
-			if _, err := client.Database("tasker").Collection("tasks").DeleteOne(ctx, bson.M{"title": task.Title}); err != nil {
-				bot.SendErrorMessage(s, err)
-				return
-			}
-		}
-		tasks = append(tasks, task)
 	}
 	if len(tasks) == 0 {
 		s.ChannelMessageSend(m.ChannelID, "No tasks crated yet")
 		return
 	}
+	message := ""
 	for _, task := range tasks {
 		if task.Done {
-			s.ChannelMessageSend(m.ChannelID, "~~"+task.Date.Local().Format("02.01.2006")+" "+task.Title+"~~")
+			message += "~~" + task.Date.Local().Format("02.01.2006") + " " + task.Title + "~~"
 		} else {
-			s.ChannelMessageSend(m.ChannelID, "**"+task.Date.Local().Format("02.01.2006")+"** "+task.Title)
+			message += "**" + task.Date.Local().Format("02.01.2006") + "** " + task.Title
 		}
+		message += "\n"
 	}
+	s.ChannelMessageSend(m.ChannelID, message)
 }
 
 // TaskAdd provide handler for !task add command
@@ -292,11 +270,6 @@ func (bot *Bot) TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	title := strings.Join(command[3:cap(command)], " ")
 
-	client, err := bot.DB.Connect()
-	if err != nil {
-		bot.SendErrorMessage(s, err)
-		return
-	}
 	task := types.Task{
 		Title:  title,
 		Date:   date,
@@ -304,9 +277,7 @@ func (bot *Bot) TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
 		UserID: m.Author.ID,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if _, err := client.Database("tasker").Collection("tasks").InsertOne(ctx, task); err != nil {
+	if err := bot.DB.AddTask(task); err != nil {
 		bot.SendErrorMessage(s, err)
 		return
 	}
@@ -321,16 +292,8 @@ func (bot *Bot) TaskDone(s *discordgo.Session, m *discordgo.MessageCreate) {
 		bot.SendErrorMessage(s, err)
 		return
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := bot.DB.Connect()
-	if err != nil {
+	if err := bot.DB.DoneTask(date); err != nil {
 		bot.SendErrorMessage(s, err)
-		return
-	}
-	if _, err := client.Database("tasker").Collection("tasks").UpdateMany(ctx, bson.M{"date": date}, bson.M{"$set": bson.M{"done": true}}); err != nil {
-		bot.SendErrorMessage(s, err)
-		return
 	}
 	s.ChannelMessageSend(m.ChannelID, "Успешно сделано")
 }
