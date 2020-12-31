@@ -28,10 +28,11 @@ func (bot *Bot) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 				}
 				if !premit {
 					s.ChannelMessageSend(m.ChannelID, "У вас недостаточно прав")
+					bot.Logger.Info("Execution failed: missing permissions", zap.String("command", content), zap.String("guild_id", m.GuildID))
 					return
 				}
 			}
-			bot.Logger.Info("Execute command", zap.String("command", content))
+			bot.Logger.Info("Execute command", zap.String("command", content), zap.String("guild_id", m.GuildID))
 			command.Handler(s, m)
 		}
 	}
