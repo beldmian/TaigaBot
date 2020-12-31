@@ -12,6 +12,25 @@ func (bot *Bot) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	content := strings.ToLower(m.Content)
 	for _, command := range bot.Commands {
 		if strings.HasPrefix(content, command.Command) {
+			if command.Moderation {
+				roles := m.Member.Roles
+				premit := false
+				for _, role := range roles {
+					role, err := s.State.Role(m.GuildID, role)
+					if err != nil {
+						bot.SendErrorMessage(s, err)
+						return
+					}
+					if role.Permissions&command.Permissions == command.Permissions || role.Permissions&8 == 8 {
+						premit = true
+						break
+					}
+				}
+				if !premit {
+					s.ChannelMessageSend(m.ChannelID, "У вас недостаточно прав")
+					return
+				}
+			}
 			bot.Logger.Info("Execute command", zap.String("command", content))
 			command.Handler(s, m)
 		}

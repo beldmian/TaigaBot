@@ -25,6 +25,7 @@ type Command struct {
 	Description string
 	Command     string
 	Moderation  bool
+	Permissions int
 	Handler     func(s *discordgo.Session, m *discordgo.MessageCreate)
 }
 
@@ -85,6 +86,7 @@ func (bot *Bot) initCommands() {
 			Command:     "!delete ",
 			Moderation:  true,
 			Handler:     bot.BulkDelete,
+			Permissions: 8192,
 		},
 		{
 			Name:        "`!massrole @<роль>`",
@@ -92,9 +94,10 @@ func (bot *Bot) initCommands() {
 			Command:     "!massrole ",
 			Moderation:  true,
 			Handler:     bot.MassRole,
+			Permissions: 268435456,
 		},
 		{
-			Name:        "`!poll <вариант 1> | <вариант 2> ...",
+			Name:        "`!poll <вариант 1> | <вариант 2> ...`",
 			Description: "Создает опрос с несколькими вариантами ответа",
 			Command:     "!poll ",
 			Moderation:  false,

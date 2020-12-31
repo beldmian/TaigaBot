@@ -23,22 +23,6 @@ import (
 
 // BulkDelete provides handler for !delete command
 func (bot *Bot) BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
-	roles := m.Member.Roles
-	premit := false
-	for _, role := range roles {
-		role, err := s.State.Role(m.GuildID, role)
-		if err != nil {
-			bot.SendErrorMessage(s, err)
-			return
-		}
-		if role.Permissions&8192 == 8192 || role.Permissions&8 == 8 {
-			premit = true
-			break
-		}
-	}
-	if !premit {
-		return
-	}
 	count, err := strconv.Atoi(strings.Split(m.Content, " ")[1])
 	if err != nil {
 		bot.SendErrorMessage(s, err)
@@ -151,20 +135,8 @@ func (bot *Bot) PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 // MassRole provides handler for !massrole command
 func (bot *Bot) MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
-	roles := m.Member.Roles
-	premit := false
-	for _, role := range roles {
-		role, err := s.State.Role(m.GuildID, role)
-		if err != nil {
-			bot.SendErrorMessage(s, err)
-			return
-		}
-		if role.Permissions&268435456 == 268435456 || role.Permissions&8 == 8 {
-			premit = true
-			break
-		}
-	}
-	if !premit {
+	if len(m.MentionRoles) == 0 {
+		s.ChannelMessageSend(m.ChannelID, "Отметьте роль в сообщении")
 		return
 	}
 	role := m.MentionRoles[0]
