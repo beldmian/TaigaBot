@@ -26,6 +26,10 @@ func (bot *Bot) BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 		bot.SendErrorMessage(s, err)
 		return
 	}
+	if count > 99 {
+		s.ChannelMessageSend(m.ChannelID, "Слишком много сообщений!")
+		return
+	}
 	messages, err := s.ChannelMessages(m.ChannelID, count+1, "", "", "")
 	if err != nil {
 		bot.SendErrorMessage(s, err)
