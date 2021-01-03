@@ -11,3 +11,4 @@ dev:
 prod:
 	mv config.toml dev.toml
 	mv prod.toml config.toml
+	rm bot.log

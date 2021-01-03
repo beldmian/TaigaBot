@@ -320,3 +320,8 @@ func (bot *Bot) Poll(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.MessageReactionAdd(m.ChannelID, message.ID, square)
 	}
 }
+
+// Vote provide handler for !vote command
+func (bot *Bot) Vote(s *discordgo.Session, m *discordgo.MessageCreate) {
+	s.ChannelMessageSend(m.ChannelID, "Чтобы поддержать бота перейдите на https://top.gg/bot/780455940566024192/vote")
+}

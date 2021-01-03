@@ -86,6 +86,13 @@ func (bot *Bot) initCommands() {
 			Moderation:  false,
 			Handler:     bot.Poll,
 		},
+		{
+			Name:        "`!vote",
+			Description: "Вы можете поддержать бота проголосовав за него на top.gg",
+			Command:     "!vote",
+			Moderation:  false,
+			Handler:     bot.Vote,
+		},
 	}
 
 	bot.Commands = commands
