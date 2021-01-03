@@ -1,4 +1,6 @@
 # TaigaBot
+[![Discord Bots](https://top.gg/api/widget/status/780455940566024192.svg)](https://top.gg/bot/780455940566024192)
+
 Simple discord bot written in go.
 
 ## Configuration
