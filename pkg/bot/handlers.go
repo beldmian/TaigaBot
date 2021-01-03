@@ -9,6 +9,10 @@ import (
 
 // OnMessage provide handler for MessageCreate event
 func (bot *Bot) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.GuildID == "" {
+		s.ChannelMessageSend(m.ChannelID, "Не работаю в личных сообщениях")
+		return
+	}
 	content := strings.ToLower(m.Content)
 	if m.Author.Bot {
 		return
