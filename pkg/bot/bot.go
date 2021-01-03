@@ -62,6 +62,9 @@ func InitBot(config types.Config) *Bot {
 	bot.Session.AddHandler(bot.OnMessage)
 	bot.Session.AddHandler(bot.OnBan)
 
+	bot.Session.State = discordgo.NewState()
+	bot.Session.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAll)
+
 	logger.Info("Bot started")
 	if err := bot.Session.Open(); err != nil {
 		log.Fatal(err)

@@ -10,25 +10,20 @@ import (
 // OnMessage provide handler for MessageCreate event
 func (bot *Bot) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	content := strings.ToLower(m.Content)
+	if m.Author.Bot {
+		return
+	}
+	s.State.MemberAdd(m.Member)
+	s.State.MessageAdd(m.Message)
 	for _, command := range bot.Commands {
 		if strings.HasPrefix(content, command.Command) {
 			if command.Moderation {
-				roles := m.Member.Roles
-				premit := false
-				for _, role := range roles {
-					role, err := s.State.Role(m.GuildID, role)
-					if err != nil {
-						bot.SendErrorMessage(s, err)
-						return
-					}
-					if role.Permissions&command.Permissions == command.Permissions || role.Permissions&8 == 8 {
-						premit = true
-						break
-					}
+				permissions, err := s.State.UserChannelPermissions(m.Author.ID, m.ChannelID)
+				if err != nil && err != discordgo.ErrStateNotFound {
+					bot.SendErrorMessage(s, err)
 				}
-				if !premit {
+				if command.Permissions&permissions != command.Permissions {
 					s.ChannelMessageSend(m.ChannelID, "У вас недостаточно прав")
-					bot.Logger.Info("Execution failed: missing permissions", zap.String("command", content), zap.String("guild_id", m.GuildID))
 					return
 				}
 			}
