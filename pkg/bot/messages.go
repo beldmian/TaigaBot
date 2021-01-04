@@ -56,12 +56,14 @@ func (bot *Bot) BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 func (bot *Bot) ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 	roles, _ := s.GuildRoles(m.GuildID)
 	var colors []color.RGBA
+	var colorNames []string
 	for _, role := range roles {
 		_, err := strconv.Atoi(role.Name)
 		if err == nil {
 			s := fmt.Sprintf("%016X", role.Color)[10:16]
 			colorOfRole, _ := ParseHexColor(s)
 			colors = append(colors, colorOfRole)
+			colorNames = append(colorNames, role.Name)
 		}
 	}
 	colorsCount := len(colors)
@@ -84,7 +86,7 @@ func (bot *Bot) ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 	})
 
 	for i := 0; i < colorsCount; i++ {
-		AddLabel(img, colors[i], (i%6)*100+50, (i/6)*100+50, strconv.Itoa(i+1), face)
+		AddLabel(img, colors[i], (i%6)*100+50, (i/6)*100+50, colorNames[i], face)
 	}
 	buf := new(bytes.Buffer)
 	if err := png.Encode(buf, img); err != nil {
