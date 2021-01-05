@@ -20,7 +20,8 @@ type Config struct {
 
 // BotConfig provide struct for bot config
 type BotConfig struct {
-	Token  string
-	DBURI  string `toml:"db_uri"`
-	LogsID string `toml:"logs_id"`
+	Token    string
+	DBURI    string `toml:"db_uri"`
+	LogsID   string `toml:"logs_id"`
+	DBLToken string `tom:"dbl_token"`
 }
