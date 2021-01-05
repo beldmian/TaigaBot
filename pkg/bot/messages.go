@@ -388,3 +388,35 @@ func (bot *Bot) Vote(s *discordgo.Session, m *discordgo.MessageCreate, locale st
 		s.ChannelMessageSend(m.ChannelID, "To support bot vote on https://top.gg/bot/780455940566024192/vote")
 	}
 }
+
+// Kiss provie handler for !kiss command
+func (bot *Bot) Kiss(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
+	resp, err := http.Get("https://shiro.gg/api/images/kiss")
+	if err != nil {
+		bot.SendErrorMessage(s, err)
+		return
+	}
+	var result map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+		Image: &discordgo.MessageEmbedImage{
+			URL: result["url"].(string),
+		},
+	})
+}
+
+// Hug provie handler for !hug command
+func (bot *Bot) Hug(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
+	resp, err := http.Get("https://shiro.gg/api/images/hug")
+	if err != nil {
+		bot.SendErrorMessage(s, err)
+		return
+	}
+	var result map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+		Image: &discordgo.MessageEmbedImage{
+			URL: result["url"].(string),
+		},
+	})
+}

@@ -144,6 +144,28 @@ func (bot *Bot) initCommands() {
 			Moderation: false,
 			Handler:    bot.Vote,
 		},
+		{
+			Translation: Translation{
+				RussianName:        "`!kiss`",
+				RussianDescription: "Отправляет гифку или каринку с поцелуем",
+				EnglishName:        "`!kiss`",
+				EnglishDescription: "Send gif or image with kiss",
+			},
+			Command:    "!kiss",
+			Moderation: false,
+			Handler:    bot.Kiss,
+		},
+		{
+			Translation: Translation{
+				RussianName:        "`!hug`",
+				RussianDescription: "Отправляет гифку обнимашек",
+				EnglishName:        "`!hug`",
+				EnglishDescription: "Send gif or image with hug",
+			},
+			Command:    "!hug",
+			Moderation: false,
+			Handler:    bot.Hug,
+		},
 	}
 
 	bot.Commands = commands
