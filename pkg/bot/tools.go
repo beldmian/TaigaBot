@@ -47,3 +47,12 @@ func (bot *Bot) SendErrorMessage(s *discordgo.Session, err error) {
 		Color:       2394819,
 	})
 }
+
+// GetServerLocal returns locale of guild by id
+func (bot *Bot) GetServerLocal(s *discordgo.Session, id string) (string, error) {
+	g, err := s.Guild(id)
+	if err != nil {
+		return "", err
+	}
+	return g.Region, nil
+}

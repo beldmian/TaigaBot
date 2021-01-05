@@ -32,7 +32,12 @@ func (bot *Bot) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 				}
 			}
 			bot.Logger.Info("Execute command", zap.String("command", content), zap.String("guild_id", m.GuildID))
-			command.Handler(s, m)
+			locale, err := bot.GetServerLocal(s, m.GuildID)
+			if err != nil {
+				bot.SendErrorMessage(s, err)
+				return
+			}
+			command.Handler(s, m, locale)
 		}
 	}
 }

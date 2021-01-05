@@ -20,14 +20,18 @@ import (
 )
 
 // BulkDelete provides handler for !delete command
-func (bot *Bot) BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	count, err := strconv.Atoi(strings.Split(m.Content, " ")[1])
 	if err != nil {
 		bot.SendErrorMessage(s, err)
 		return
 	}
 	if count > 99 {
-		s.ChannelMessageSend(m.ChannelID, "Слишком много сообщений!")
+		if locale == "russia" {
+			s.ChannelMessageSend(m.ChannelID, "Слишком много сообщений!")
+		} else {
+			s.ChannelMessageSend(m.ChannelID, "Too many messages!")
+		}
 		return
 	}
 	messages, err := s.ChannelMessages(m.ChannelID, count+1, "", "", "")
@@ -43,7 +47,12 @@ func (bot *Bot) BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 		bot.SendErrorMessage(s, err)
 		return
 	}
-	msg, err := s.ChannelMessageSend(m.ChannelID, "Успешно удалено "+strconv.Itoa(count)+" сообщений")
+	var msg *discordgo.Message
+	if locale == "russia" {
+		msg, err = s.ChannelMessageSend(m.ChannelID, "Успешно удалено "+strconv.Itoa(count)+" сообщений")
+	} else {
+		msg, err = s.ChannelMessageSend(m.ChannelID, "Successfuly delete  "+strconv.Itoa(count)+" messages")
+	}
 	if err != nil {
 		bot.SendErrorMessage(s, err)
 		return
@@ -53,7 +62,7 @@ func (bot *Bot) BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // ColorsList provides handler for !colors command
-func (bot *Bot) ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) ColorsList(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	roles, _ := s.GuildRoles(m.GuildID)
 	var colors []color.RGBA
 	var colorNames []string
@@ -101,7 +110,7 @@ func (bot *Bot) ColorsList(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // PickColor provides handler for !color command
-func (bot *Bot) PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) PickColor(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	userColor := strings.Split(m.Content, " ")[1]
 	roles, _ := s.GuildRoles(m.GuildID)
 	var colorRoles discordgo.Roles
@@ -117,7 +126,13 @@ func (bot *Bot) PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 				bot.SendErrorMessage(s, err)
 				return
 			}
-			msg, err := s.ChannelMessageSend(m.ChannelID, "Цвет успешно изменен")
+			var msg *discordgo.Message
+			var err error
+			if locale == "russia" {
+				msg, err = s.ChannelMessageSend(m.ChannelID, "Цвет успешно изменен")
+			} else {
+				msg, err = s.ChannelMessageSend(m.ChannelID, "Color changed successfuly")
+			}
 			if err != nil {
 				bot.SendErrorMessage(s, err)
 				return
@@ -138,9 +153,13 @@ func (bot *Bot) PickColor(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // MassRole provides handler for !massrole command
-func (bot *Bot) MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) MassRole(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	if len(m.MentionRoles) == 0 {
-		s.ChannelMessageSend(m.ChannelID, "Отметьте роль в сообщении")
+		if locale == "russia" {
+			s.ChannelMessageSend(m.ChannelID, "Отметьте роль в сообщении")
+		} else {
+			s.ChannelMessageSend(m.ChannelID, "Mention role in message")
+		}
 		return
 	}
 	role := m.MentionRoles[0]
@@ -178,7 +197,7 @@ func (bot *Bot) MassRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // GetAnime provides handler for !anime command
-func (bot *Bot) GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) GetAnime(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	command := strings.Split(m.Content, " ")
 	search := strings.Join(command[1:cap(command)], "%20")
 	resp, err := http.Get("https://shikimori.one/api/animes?search=" + search + "&limit=10&order=ranked")
@@ -208,20 +227,36 @@ func (bot *Bot) GetAnime(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // Help provides handler for !help command
-func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	var common []*discordgo.MessageEmbedField
 	var moderation []*discordgo.MessageEmbedField
-	for _, command := range bot.Commands {
-		if command.Moderation {
-			moderation = append(moderation, &discordgo.MessageEmbedField{
-				Name:  command.Name,
-				Value: command.Description,
-			})
-		} else {
-			common = append(common, &discordgo.MessageEmbedField{
-				Name:  command.Name,
-				Value: command.Description,
-			})
+	if locale == "russia" {
+		for _, command := range bot.Commands {
+			if command.Moderation {
+				moderation = append(moderation, &discordgo.MessageEmbedField{
+					Name:  command.Translation.RussianName,
+					Value: command.Translation.RussianDescription,
+				})
+			} else {
+				common = append(common, &discordgo.MessageEmbedField{
+					Name:  command.Translation.RussianName,
+					Value: command.Translation.RussianDescription,
+				})
+			}
+		}
+	} else {
+		for _, command := range bot.Commands {
+			if command.Moderation {
+				moderation = append(moderation, &discordgo.MessageEmbedField{
+					Name:  command.Translation.EnglishName,
+					Value: command.Translation.EnglishDescription,
+				})
+			} else {
+				common = append(common, &discordgo.MessageEmbedField{
+					Name:  command.Translation.EnglishName,
+					Value: command.Translation.EnglishDescription,
+				})
+			}
 		}
 	}
 	fields := common
@@ -236,15 +271,23 @@ func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if err != nil {
 		bot.SendErrorMessage(s, err)
 	}
-	s.ChannelMessageSendEmbed(ch.ID, &discordgo.MessageEmbed{
-		Title:  "Комманды бота",
-		Fields: fields,
-	})
-	s.ChannelMessageSend(m.ChannelID, "Проверь личные сообщения")
+	if locale == "russia" {
+		s.ChannelMessageSendEmbed(ch.ID, &discordgo.MessageEmbed{
+			Title:  "Комманды бота",
+			Fields: fields,
+		})
+		s.ChannelMessageSend(m.ChannelID, "Проверь личные сообщения")
+	} else {
+		s.ChannelMessageSendEmbed(ch.ID, &discordgo.MessageEmbed{
+			Title:  "Bot commands",
+			Fields: fields,
+		})
+		s.ChannelMessageSend(m.ChannelID, "Check your DMs")
+	}
 }
 
 // Tasks provides handler for !tasks command
-func (bot *Bot) Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) Tasks(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	tasks, err := bot.DB.GetTasks(m.Author.ID)
 	if err != nil {
 		bot.SendErrorMessage(s, err)
@@ -267,7 +310,7 @@ func (bot *Bot) Tasks(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // TaskAdd provide handler for !task add command
-func (bot *Bot) TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	command := strings.Split(m.Content, " ")
 	date, err := time.Parse("02.01.2006", command[2])
 	if err != nil {
@@ -287,11 +330,15 @@ func (bot *Bot) TaskAdd(s *discordgo.Session, m *discordgo.MessageCreate) {
 		bot.SendErrorMessage(s, err)
 		return
 	}
-	s.ChannelMessageSend(m.ChannelID, "Успешно добавлено")
+	if locale == "russia" {
+		s.ChannelMessageSend(m.ChannelID, "Успешно добавлено")
+	} else {
+		s.ChannelMessageSend(m.ChannelID, "Successfuly added")
+	}
 }
 
 // TaskDone provide handler for !task add command
-func (bot *Bot) TaskDone(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) TaskDone(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	command := strings.Split(m.Content, " ")
 	date, err := time.Parse("02.01.2006", command[2])
 	if err != nil {
@@ -301,11 +348,15 @@ func (bot *Bot) TaskDone(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if err := bot.DB.DoneTask(date); err != nil {
 		bot.SendErrorMessage(s, err)
 	}
-	s.ChannelMessageSend(m.ChannelID, "Успешно сделано")
+	if locale == "russia" {
+		s.ChannelMessageSend(m.ChannelID, "Успешно сделано")
+	} else {
+		s.ChannelMessageSend(m.ChannelID, "Successfuly done")
+	}
 }
 
 // Poll provide handler for !poll command
-func (bot *Bot) Poll(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (bot *Bot) Poll(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	squares := []string{"\U0001F7E8", "\U0001F7E7", "\U0001F7E9", "\U0001F7EB", "\U0001F7EA", "\U0001F7E5", "\U0001F7E6"}
 	command := strings.Split(m.Content, " ")
 	variants := strings.Split(strings.Join(command[1:cap(command)], ""), "|")
@@ -314,7 +365,13 @@ func (bot *Bot) Poll(s *discordgo.Session, m *discordgo.MessageCreate) {
 	for i, variant := range variants {
 		variantsText += squares[i] + " " + variant + "\n"
 	}
-	message, err := s.ChannelMessageSend(m.ChannelID, "Голосование:\n"+variantsText)
+	var message *discordgo.Message
+	var err error
+	if locale == "russia" {
+		message, err = s.ChannelMessageSend(m.ChannelID, "Голосование:\n"+variantsText)
+	} else {
+		message, err = s.ChannelMessageSend(m.ChannelID, "Poll:\n"+variantsText)
+	}
 	if err != nil {
 		bot.SendErrorMessage(s, err)
 	}
@@ -324,6 +381,10 @@ func (bot *Bot) Poll(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 // Vote provide handler for !vote command
-func (bot *Bot) Vote(s *discordgo.Session, m *discordgo.MessageCreate) {
-	s.ChannelMessageSend(m.ChannelID, "Чтобы поддержать бота перейдите на https://top.gg/bot/780455940566024192/vote")
+func (bot *Bot) Vote(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
+	if locale == "russia" {
+		s.ChannelMessageSend(m.ChannelID, "Чтобы поддержать бота перейдите на https://top.gg/bot/780455940566024192/vote")
+	} else {
+		s.ChannelMessageSend(m.ChannelID, "To support bot vote on https://top.gg/bot/780455940566024192/vote")
+	}
 }
