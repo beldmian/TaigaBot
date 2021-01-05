@@ -44,8 +44,13 @@ func (bot *Bot) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 // OnBan provide handler for GuildBanAdd event
 func (bot *Bot) OnBan(s *discordgo.Session, m *discordgo.GuildBanAdd) {
+	g, err := s.Guild(m.GuildID)
+	if err != nil {
+		bot.SendErrorMessage(s, err)
+	}
+	logChannel := g.SystemChannelID
 	bot.Logger.Info("User banned", zap.String("user_id", m.User.ID))
-	if _, err := s.ChannelMessageSendEmbed(bot.LogsID, &discordgo.MessageEmbed{
+	if _, err := s.ChannelMessageSendEmbed(logChannel, &discordgo.MessageEmbed{
 		Title: m.User.Username + " был забанен на сервере",
 		Color: 2343740,
 	}); err != nil {
