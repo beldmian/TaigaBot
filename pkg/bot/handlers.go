@@ -54,6 +54,6 @@ func (bot *Bot) OnBan(s *discordgo.Session, m *discordgo.GuildBanAdd) {
 		Title: m.User.Username + " был забанен на сервере",
 		Color: 2343740,
 	}); err != nil {
-		bot.SendErrorMessage(s, err)
+		return
 	}
 }
