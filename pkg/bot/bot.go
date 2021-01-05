@@ -105,7 +105,7 @@ func (bot *Bot) StopBot() {
 // PostData ...
 func (bot *Bot) PostData() error {
 	err := bot.DBLclient.PostBotStats(bot.Session.State.User.ID, &dbl.BotStatsPayload{
-		Shards: []int{bot.Session.ShardCount},
+		Shards: []int{len(bot.Session.State.Guilds)},
 	})
 	return err
 }
