@@ -391,32 +391,39 @@ func (bot *Bot) Vote(s *discordgo.Session, m *discordgo.MessageCreate, locale st
 
 // Kiss provie handler for !kiss command
 func (bot *Bot) Kiss(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
-	resp, err := http.Get("https://shiro.gg/api/images/kiss")
+	url, err := bot.GetGif("kiss")
 	if err != nil {
 		bot.SendErrorMessage(s, err)
-		return
 	}
-	var result map[string]interface{}
-	json.NewDecoder(resp.Body).Decode(&result)
 	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 		Image: &discordgo.MessageEmbedImage{
-			URL: result["url"].(string),
+			URL: url,
 		},
 	})
 }
 
 // Hug provie handler for !hug command
 func (bot *Bot) Hug(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
-	resp, err := http.Get("https://shiro.gg/api/images/hug")
+	url, err := bot.GetGif("hug")
 	if err != nil {
 		bot.SendErrorMessage(s, err)
-		return
 	}
-	var result map[string]interface{}
-	json.NewDecoder(resp.Body).Decode(&result)
 	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 		Image: &discordgo.MessageEmbedImage{
-			URL: result["url"].(string),
+			URL: url,
+		},
+	})
+}
+
+// Pat provie handler for !pat command
+func (bot *Bot) Pat(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
+	url, err := bot.GetGif("pat")
+	if err != nil {
+		bot.SendErrorMessage(s, err)
+	}
+	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+		Image: &discordgo.MessageEmbedImage{
+			URL: url,
 		},
 	})
 }

@@ -1,9 +1,11 @@
 package bot
 
 import (
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/color"
+	"net/http"
 
 	"github.com/bwmarrin/discordgo"
 	"go.uber.org/zap"
@@ -55,4 +57,15 @@ func (bot *Bot) GetServerLocal(s *discordgo.Session, id string) (string, error) 
 		return "", err
 	}
 	return g.Region, nil
+}
+
+// GetGif provide function for get the gif url from shiro.gg
+func (bot *Bot) GetGif(theme string) (string, error) {
+	resp, err := http.Get("https://shiro.gg/api/images/" + theme)
+	if err != nil {
+		return "", err
+	}
+	var result map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+	return result["url"].(string), nil
 }
