@@ -427,3 +427,16 @@ func (bot *Bot) Pat(s *discordgo.Session, m *discordgo.MessageCreate, locale str
 		},
 	})
 }
+
+// Pout provie handler for !pout command
+func (bot *Bot) Pout(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
+	url, err := bot.GetGif("pout")
+	if err != nil {
+		bot.SendErrorMessage(s, err)
+	}
+	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+		Image: &discordgo.MessageEmbedImage{
+			URL: url,
+		},
+	})
+}

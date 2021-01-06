@@ -177,6 +177,17 @@ func (bot *Bot) initCommands() {
 			Moderation: false,
 			Handler:    bot.Pat,
 		},
+		{
+			Translation: Translation{
+				RussianName:        "`!pout`",
+				RussianDescription: "Отправляет гифку с дующимся персонажем",
+				EnglishName:        "`!pout`",
+				EnglishDescription: "Send gif with pout",
+			},
+			Command:    "!pout",
+			Moderation: false,
+			Handler:    bot.Pout,
+		},
 	}
 
 	bot.Commands = commands
