@@ -2,11 +2,17 @@ package bot
 
 import "github.com/bwmarrin/discordgo"
 
+const (
+	basicCategory = iota
+	moderationCategory
+	gifCategory
+)
+
 // Command provide struct for commands
 type Command struct {
 	Translation Translation
 	Command     string
-	Moderation  bool
+	Category    int
 	Permissions int
 	Handler     func(s *discordgo.Session, m *discordgo.MessageCreate, locale string)
 }
@@ -23,14 +29,14 @@ func (bot *Bot) initCommands() {
 	commands := []Command{
 		{
 			Translation: Translation{
-				RussianName:        "`!help (moderation)`",
+				RussianName:        "`!help (moderation) (gif)`",
 				RussianDescription: "Список команд бота",
-				EnglishName:        "`!help (moderation)`",
+				EnglishName:        "`!help (moderation) (gif)`",
 				EnglishDescription: "List of bot commands",
 			},
-			Command:    "!help",
-			Moderation: false,
-			Handler:    bot.Help,
+			Command:  "!help",
+			Category: basicCategory,
+			Handler:  bot.Help,
 		},
 		{
 			Translation: Translation{
@@ -39,9 +45,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!colors`",
 				EnglishDescription: "List of avaivable colors",
 			},
-			Command:    "!colors",
-			Moderation: false,
-			Handler:    bot.ColorsList,
+			Command:  "!colors",
+			Category: basicCategory,
+			Handler:  bot.ColorsList,
 		},
 		{
 			Translation: Translation{
@@ -50,9 +56,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!color <color number>`",
 				EnglishDescription: "Give you that color",
 			},
-			Command:    "!color ",
-			Moderation: false,
-			Handler:    bot.PickColor,
+			Command:  "!color ",
+			Category: basicCategory,
+			Handler:  bot.PickColor,
 		},
 		{
 			Translation: Translation{
@@ -61,9 +67,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!anime <name>`",
 				EnglishDescription: "Search anime by name (russian description only)",
 			},
-			Command:    "!anime ",
-			Moderation: false,
-			Handler:    bot.GetAnime,
+			Command:  "!anime ",
+			Category: basicCategory,
+			Handler:  bot.GetAnime,
 		},
 		{
 			Translation: Translation{
@@ -72,9 +78,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!tasks`",
 				EnglishDescription: "Your task list",
 			},
-			Command:    "!tasks",
-			Moderation: false,
-			Handler:    bot.Tasks,
+			Command:  "!tasks",
+			Category: basicCategory,
+			Handler:  bot.Tasks,
 		},
 		{
 			Translation: Translation{
@@ -83,9 +89,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!task add <date 01.02.2020> <task desc>`",
 				EnglishDescription: "Add task to your list",
 			},
-			Command:    "!task add ",
-			Moderation: false,
-			Handler:    bot.TaskAdd,
+			Command:  "!task add ",
+			Category: basicCategory,
+			Handler:  bot.TaskAdd,
 		},
 		{
 			Translation: Translation{
@@ -94,9 +100,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!task done <date 01.02.2020>`",
 				EnglishDescription: "Mark task as done",
 			},
-			Command:    "!task done ",
-			Moderation: false,
-			Handler:    bot.TaskDone,
+			Command:  "!task done ",
+			Category: basicCategory,
+			Handler:  bot.TaskDone,
 		},
 		{
 			Translation: Translation{
@@ -106,7 +112,7 @@ func (bot *Bot) initCommands() {
 				EnglishDescription: "Delete messages",
 			},
 			Command:     "!delete ",
-			Moderation:  true,
+			Category:    moderationCategory,
 			Handler:     bot.BulkDelete,
 			Permissions: 8192,
 		},
@@ -118,7 +124,7 @@ func (bot *Bot) initCommands() {
 				EnglishDescription: "Give role for all server members",
 			},
 			Command:     "!massrole ",
-			Moderation:  true,
+			Category:    moderationCategory,
 			Handler:     bot.MassRole,
 			Permissions: 268435456,
 		},
@@ -129,9 +135,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!poll <option 1> | <option 2> ...`",
 				EnglishDescription: "Create poll with some answers",
 			},
-			Command:    "!poll ",
-			Moderation: false,
-			Handler:    bot.Poll,
+			Command:  "!poll ",
+			Category: basicCategory,
+			Handler:  bot.Poll,
 		},
 		{
 			Translation: Translation{
@@ -140,9 +146,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!vote`",
 				EnglishDescription: "You can support bot on top.gg",
 			},
-			Command:    "!vote",
-			Moderation: false,
-			Handler:    bot.Vote,
+			Command:  "!vote",
+			Category: basicCategory,
+			Handler:  bot.Vote,
 		},
 		{
 			Translation: Translation{
@@ -151,9 +157,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!kiss`",
 				EnglishDescription: "Send gif or image with kiss",
 			},
-			Command:    "!kiss",
-			Moderation: false,
-			Handler:    bot.Kiss,
+			Command:  "!kiss",
+			Category: gifCategory,
+			Handler:  bot.Kiss,
 		},
 		{
 			Translation: Translation{
@@ -162,9 +168,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!hug`",
 				EnglishDescription: "Send gif or image with hug",
 			},
-			Command:    "!hug",
-			Moderation: false,
-			Handler:    bot.Hug,
+			Command:  "!hug",
+			Category: gifCategory,
+			Handler:  bot.Hug,
 		},
 		{
 			Translation: Translation{
@@ -173,9 +179,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!pat`",
 				EnglishDescription: "Send gif with pat",
 			},
-			Command:    "!pat",
-			Moderation: false,
-			Handler:    bot.Pat,
+			Command:  "!pat",
+			Category: gifCategory,
+			Handler:  bot.Pat,
 		},
 		{
 			Translation: Translation{
@@ -184,9 +190,9 @@ func (bot *Bot) initCommands() {
 				EnglishName:        "`!pout`",
 				EnglishDescription: "Send gif with pout",
 			},
-			Command:    "!pout",
-			Moderation: false,
-			Handler:    bot.Pout,
+			Command:  "!pout",
+			Category: gifCategory,
+			Handler:  bot.Pout,
 		},
 	}
 

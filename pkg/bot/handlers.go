@@ -21,7 +21,7 @@ func (bot *Bot) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	s.State.MessageAdd(m.Message)
 	for _, command := range bot.Commands {
 		if strings.HasPrefix(content, command.Command) {
-			if command.Moderation {
+			if command.Category == moderationCategory {
 				permissions, err := s.State.UserChannelPermissions(m.Author.ID, m.ChannelID)
 				if err != nil && err != discordgo.ErrStateNotFound {
 					bot.SendErrorMessage(s, err)

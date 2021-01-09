@@ -230,32 +230,51 @@ func (bot *Bot) GetAnime(s *discordgo.Session, m *discordgo.MessageCreate, local
 func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
 	var common []*discordgo.MessageEmbedField
 	var moderation []*discordgo.MessageEmbedField
+	var gif []*discordgo.MessageEmbedField
 	if locale == "russia" {
 		for _, command := range bot.Commands {
-			if command.Moderation {
-				moderation = append(moderation, &discordgo.MessageEmbedField{
-					Name:  command.Translation.RussianName,
-					Value: command.Translation.RussianDescription,
-				})
-			} else {
+			switch command.Category {
+			case basicCategory:
 				common = append(common, &discordgo.MessageEmbedField{
 					Name:  command.Translation.RussianName,
 					Value: command.Translation.RussianDescription,
 				})
+				break
+			case moderationCategory:
+				moderation = append(moderation, &discordgo.MessageEmbedField{
+					Name:  command.Translation.RussianName,
+					Value: command.Translation.RussianDescription,
+				})
+				break
+			case gifCategory:
+				gif = append(gif, &discordgo.MessageEmbedField{
+					Name:  command.Translation.RussianName,
+					Value: command.Translation.RussianDescription,
+				})
+				break
 			}
 		}
 	} else {
 		for _, command := range bot.Commands {
-			if command.Moderation {
-				moderation = append(moderation, &discordgo.MessageEmbedField{
-					Name:  command.Translation.EnglishName,
-					Value: command.Translation.EnglishDescription,
-				})
-			} else {
+			switch command.Category {
+			case basicCategory:
 				common = append(common, &discordgo.MessageEmbedField{
-					Name:  command.Translation.EnglishName,
-					Value: command.Translation.EnglishDescription,
+					Name:  command.Translation.RussianName,
+					Value: command.Translation.RussianDescription,
 				})
+				break
+			case moderationCategory:
+				moderation = append(moderation, &discordgo.MessageEmbedField{
+					Name:  command.Translation.RussianName,
+					Value: command.Translation.RussianDescription,
+				})
+				break
+			case gifCategory:
+				gif = append(gif, &discordgo.MessageEmbedField{
+					Name:  command.Translation.RussianName,
+					Value: command.Translation.RussianDescription,
+				})
+				break
 			}
 		}
 	}
@@ -263,8 +282,11 @@ func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate, locale st
 	command := strings.Split(m.Content, " ")
 	if len(command) != 1 {
 		help := command[1]
-		if help == "moderation" {
+		switch help {
+		case "moderation":
 			fields = moderation
+		case "gif":
+			fields = gif
 		}
 	}
 	ch, err := s.UserChannelCreate(m.Author.ID)
