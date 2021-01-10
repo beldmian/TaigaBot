@@ -272,6 +272,28 @@ func (bot *Bot) initCommands() {
 			Category: nsfwCategory,
 			Handler:  bot.GifGenerator("nsfw/hentai"),
 		},
+		{
+			Translation: Translation{
+				RussianName:        "`!bondage`",
+				RussianDescription: "Отправляет гифку со связанным персонажем",
+				EnglishName:        "`!bondage`",
+				EnglishDescription: "Send gif with bondage",
+			},
+			Command:  "!bondage",
+			Category: nsfwCategory,
+			Handler:  bot.GifGenerator("nsfw/bondage"),
+		},
+		{
+			Translation: Translation{
+				RussianName:        "`!thighs`",
+				RussianDescription: "Отправляет гифку с бедрами",
+				EnglishName:        "`!thighs`",
+				EnglishDescription: "Send gif with thighs",
+			},
+			Command:  "!thighs",
+			Category: nsfwCategory,
+			Handler:  bot.GifGenerator("nsfw/thighs"),
+		},
 	}
 
 	bot.Commands = commands
