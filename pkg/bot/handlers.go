@@ -31,6 +31,16 @@ func (bot *Bot) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 					return
 				}
 			}
+			if command.Category == nsfwCategory {
+				ch, err := s.Channel(m.ChannelID)
+				if err != nil {
+					bot.SendErrorMessage(s, err)
+				}
+				if !ch.NSFW {
+					s.ChannelMessageSend(m.ChannelID, "Только nsfw каналы")
+					return
+				}
+			}
 			bot.Logger.Info("Execute command", zap.String("command", content), zap.String("guild_id", m.GuildID))
 			locale, err := bot.GetServerLocal(s, m.GuildID)
 			if err != nil {

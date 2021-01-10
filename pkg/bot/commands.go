@@ -6,6 +6,7 @@ const (
 	basicCategory = iota
 	moderationCategory
 	gifCategory
+	nsfwCategory
 )
 
 // Command provide struct for commands
@@ -259,6 +260,17 @@ func (bot *Bot) initCommands() {
 			Command:  "!tickle",
 			Category: gifCategory,
 			Handler:  bot.GifGenerator("tickle"),
+		},
+		{
+			Translation: Translation{
+				RussianName:        "`!hentai`",
+				RussianDescription: "Отправляет гифку с хентаем",
+				EnglishName:        "`!hentai`",
+				EnglishDescription: "Send gif with hentai",
+			},
+			Command:  "!hentai",
+			Category: nsfwCategory,
+			Handler:  bot.GifGenerator("nsfw/hentai"),
 		},
 	}
 

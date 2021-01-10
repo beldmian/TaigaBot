@@ -231,6 +231,7 @@ func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate, locale st
 	var common []*discordgo.MessageEmbedField
 	var moderation []*discordgo.MessageEmbedField
 	var gif []*discordgo.MessageEmbedField
+	var nsfw []*discordgo.MessageEmbedField
 	if locale == "russia" {
 		for _, command := range bot.Commands {
 			switch command.Category {
@@ -252,6 +253,12 @@ func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate, locale st
 					Value: command.Translation.RussianDescription,
 				})
 				break
+			case nsfwCategory:
+				nsfw = append(nsfw, &discordgo.MessageEmbedField{
+					Name:  command.Translation.RussianName,
+					Value: command.Translation.RussianDescription,
+				})
+				break
 			}
 		}
 	} else {
@@ -259,20 +266,26 @@ func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate, locale st
 			switch command.Category {
 			case basicCategory:
 				common = append(common, &discordgo.MessageEmbedField{
-					Name:  command.Translation.RussianName,
-					Value: command.Translation.RussianDescription,
+					Name:  command.Translation.EnglishName,
+					Value: command.Translation.EnglishDescription,
 				})
 				break
 			case moderationCategory:
 				moderation = append(moderation, &discordgo.MessageEmbedField{
-					Name:  command.Translation.RussianName,
-					Value: command.Translation.RussianDescription,
+					Name:  command.Translation.EnglishName,
+					Value: command.Translation.EnglishDescription,
 				})
 				break
 			case gifCategory:
 				gif = append(gif, &discordgo.MessageEmbedField{
-					Name:  command.Translation.RussianName,
-					Value: command.Translation.RussianDescription,
+					Name:  command.Translation.EnglishName,
+					Value: command.Translation.EnglishDescription,
+				})
+				break
+			case nsfwCategory:
+				nsfw = append(nsfw, &discordgo.MessageEmbedField{
+					Name:  command.Translation.EnglishName,
+					Value: command.Translation.EnglishDescription,
 				})
 				break
 			}
@@ -287,6 +300,8 @@ func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate, locale st
 			fields = moderation
 		case "gif":
 			fields = gif
+		case "nsfw":
+			fields = nsfw
 		}
 	}
 	ch, err := s.UserChannelCreate(m.Author.ID)
