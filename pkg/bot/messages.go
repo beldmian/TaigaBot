@@ -411,54 +411,17 @@ func (bot *Bot) Vote(s *discordgo.Session, m *discordgo.MessageCreate, locale st
 	}
 }
 
-// Kiss provie handler for !kiss command
-func (bot *Bot) Kiss(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
-	url, err := bot.GetGif("kiss")
-	if err != nil {
-		bot.SendErrorMessage(s, err)
+// GifGenerator provide function to generate gif command handler
+func (bot *Bot) GifGenerator(theme string) func(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
+	return func(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
+		url, err := bot.GetGif(theme)
+		if err != nil {
+			bot.SendErrorMessage(s, err)
+		}
+		s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+			Image: &discordgo.MessageEmbedImage{
+				URL: url,
+			},
+		})
 	}
-	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Image: &discordgo.MessageEmbedImage{
-			URL: url,
-		},
-	})
-}
-
-// Hug provie handler for !hug command
-func (bot *Bot) Hug(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
-	url, err := bot.GetGif("hug")
-	if err != nil {
-		bot.SendErrorMessage(s, err)
-	}
-	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Image: &discordgo.MessageEmbedImage{
-			URL: url,
-		},
-	})
-}
-
-// Pat provie handler for !pat command
-func (bot *Bot) Pat(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
-	url, err := bot.GetGif("pat")
-	if err != nil {
-		bot.SendErrorMessage(s, err)
-	}
-	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Image: &discordgo.MessageEmbedImage{
-			URL: url,
-		},
-	})
-}
-
-// Pout provie handler for !pout command
-func (bot *Bot) Pout(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
-	url, err := bot.GetGif("pout")
-	if err != nil {
-		bot.SendErrorMessage(s, err)
-	}
-	s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
-		Image: &discordgo.MessageEmbedImage{
-			URL: url,
-		},
-	})
 }

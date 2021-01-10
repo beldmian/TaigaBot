@@ -159,7 +159,7 @@ func (bot *Bot) initCommands() {
 			},
 			Command:  "!kiss",
 			Category: gifCategory,
-			Handler:  bot.Kiss,
+			Handler:  bot.GifGenerator("kiss"),
 		},
 		{
 			Translation: Translation{
@@ -170,7 +170,7 @@ func (bot *Bot) initCommands() {
 			},
 			Command:  "!hug",
 			Category: gifCategory,
-			Handler:  bot.Hug,
+			Handler:  bot.GifGenerator("hug"),
 		},
 		{
 			Translation: Translation{
@@ -181,7 +181,7 @@ func (bot *Bot) initCommands() {
 			},
 			Command:  "!pat",
 			Category: gifCategory,
-			Handler:  bot.Pat,
+			Handler:  bot.GifGenerator("pat"),
 		},
 		{
 			Translation: Translation{
@@ -192,7 +192,73 @@ func (bot *Bot) initCommands() {
 			},
 			Command:  "!pout",
 			Category: gifCategory,
-			Handler:  bot.Pout,
+			Handler:  bot.GifGenerator("pout"),
+		},
+		{
+			Translation: Translation{
+				RussianName:        "`!blush`",
+				RussianDescription: "Отправляет гифку с краснеющим персонажем",
+				EnglishName:        "`!blush`",
+				EnglishDescription: "Send gif with blush",
+			},
+			Command:  "!blush",
+			Category: gifCategory,
+			Handler:  bot.GifGenerator("blush"),
+		},
+		{
+			Translation: Translation{
+				RussianName:        "`!neko`",
+				RussianDescription: "Отправляет гифку с неко персонажем",
+				EnglishName:        "`!neko`",
+				EnglishDescription: "Send gif with neko",
+			},
+			Command:  "!neko",
+			Category: gifCategory,
+			Handler:  bot.GifGenerator("neko"),
+		},
+		{
+			Translation: Translation{
+				RussianName:        "`!nom`",
+				RussianDescription: "Отправляет гифку с персонажем, который ест",
+				EnglishName:        "`!nom`",
+				EnglishDescription: "Send gif with nom",
+			},
+			Command:  "!nom",
+			Category: gifCategory,
+			Handler:  bot.GifGenerator("nom"),
+		},
+		{
+			Translation: Translation{
+				RussianName:        "`!poke`",
+				RussianDescription: "Отправляет гифку с тыкающим персонажем",
+				EnglishName:        "`!poke`",
+				EnglishDescription: "Send gif with poke",
+			},
+			Command:  "!poke",
+			Category: gifCategory,
+			Handler:  bot.GifGenerator("poke"),
+		},
+		{
+			Translation: Translation{
+				RussianName:        "`!slap`",
+				RussianDescription: "Отправляет гифку с пощечиной",
+				EnglishName:        "`!slap`",
+				EnglishDescription: "Send gif with slap",
+			},
+			Command:  "!slap",
+			Category: gifCategory,
+			Handler:  bot.GifGenerator("slap"),
+		},
+		{
+			Translation: Translation{
+				RussianName:        "`!tickle`",
+				RussianDescription: "Отправляет гифку с щекочущим персонажем",
+				EnglishName:        "`!tickle`",
+				EnglishDescription: "Send gif with tickle",
+			},
+			Command:  "!tickle",
+			Category: gifCategory,
+			Handler:  bot.GifGenerator("tickle"),
 		},
 	}
 
