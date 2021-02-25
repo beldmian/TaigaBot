@@ -37,15 +37,11 @@ func InitBot(config types.Config) *Bot {
 			log.Print("No token or logs channel ID provided")
 			return nil
 		}
-		datebase = db.DB{
-			DbURL: dbURI,
-		}
+		datebase = db.New(dbURI)
 	} else {
 		token = config.Bot.Token
 		logsID = config.Bot.LogsID
-		datebase = db.DB{
-			DbURL: config.Bot.DBURI,
-		}
+		datebase = db.New(config.Bot.DBURI)
 		dblToken = config.Bot.DBLToken
 	}
 	discord, err := discordgo.New("Bot " + token)

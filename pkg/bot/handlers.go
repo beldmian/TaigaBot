@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"log"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -19,6 +20,17 @@ func (bot *Bot) OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	s.State.MemberAdd(m.Member)
 	s.State.MessageAdd(m.Message)
+	prefix, err := bot.DB.GetPrefix(m.GuildID)
+	if err != nil {
+		bot.SendErrorMessage(s, err)
+		return
+	}
+	if !strings.HasPrefix(content, prefix) {
+		return
+	}
+	content = strings.TrimPrefix(content, prefix)
+	log.Print(content)
+
 	for _, command := range bot.Commands {
 		if strings.HasPrefix(content, command.Command) {
 			if command.Category == moderationCategory {

@@ -308,15 +308,19 @@ func (bot *Bot) Help(s *discordgo.Session, m *discordgo.MessageCreate, locale st
 	if err != nil {
 		bot.SendErrorMessage(s, err)
 	}
+	prefix, err := bot.DB.GetPrefix(m.GuildID)
+	if err != nil {
+		bot.SendErrorMessage(s, err)
+	}
 	if locale == "russia" {
 		s.ChannelMessageSendEmbed(ch.ID, &discordgo.MessageEmbed{
-			Title:  "Комманды бота",
+			Title:  "Комманды бота, текущий префикс - `" + prefix + "`",
 			Fields: fields,
 		})
 		s.ChannelMessageSend(m.ChannelID, "Проверь личные сообщения")
 	} else {
 		s.ChannelMessageSendEmbed(ch.ID, &discordgo.MessageEmbed{
-			Title:  "Bot commands",
+			Title:  "Bot commands, prefix is - `" + prefix + "`",
 			Fields: fields,
 		})
 		s.ChannelMessageSend(m.ChannelID, "Check your DMs")
@@ -438,5 +442,23 @@ func (bot *Bot) GifGenerator(theme string) func(s *discordgo.Session, m *discord
 				URL: url,
 			},
 		})
+	}
+}
+
+// Prefix provide command to change bot prefix
+func (bot *Bot) Prefix(s *discordgo.Session, m *discordgo.MessageCreate, locale string) {
+	command := strings.Split(m.Content, " ")
+	newPrefix := command[1]
+	if newPrefix == "" {
+		return
+	}
+	if err := bot.DB.SetPrefix(m.GuildID, newPrefix); err != nil {
+		bot.SendErrorMessage(s, err)
+		return
+	}
+	if locale == "russia" {
+		s.ChannelMessageSend(m.ChannelID, "Префикс успешно изменен на `"+newPrefix+"`")
+	} else {
+		s.ChannelMessageSend(m.ChannelID, "Prefix successfuly changed to `"+newPrefix+"`")
 	}
 }
