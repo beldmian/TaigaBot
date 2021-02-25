@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ServerInfo provide db struct to store server info
@@ -27,7 +28,7 @@ func (db DB) GetPrefix(id string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	var server ServerInfo
-	if err := client.Database("info").Collection("servers").FindOne(ctx, filter).Decode(&server); err != nil {
+	if err := client.Database("info").Collection("servers").FindOne(ctx, filter).Decode(&server); err != nil && err != mongo.ErrNoDocuments {
 		return "", err
 	}
 	if server.Prefix != "" {
@@ -47,7 +48,7 @@ func (db DB) SetPrefix(id string, prefix string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	var server ServerInfo
-	if err := client.Database("info").Collection("servers").FindOne(ctx, filter).Decode(&server); err != nil {
+	if err := client.Database("info").Collection("servers").FindOne(ctx, filter).Decode(&server); err != nil && err != mongo.ErrNoDocuments {
 		return err
 	}
 	server.Prefix = prefix
